@@ -7,16 +7,20 @@ export default function App() {
 
   useEffect(() => {
     fetch("/api/")
-        .then((res) => res.json())
-        .then((json: unknown) => setHealth(HealthResponse.parse(json)))
-        .catch((e: unknown) => setError(String(e)));
+      .then((res) => res.json())
+      .then((json: unknown) => setHealth(HealthResponse.parse(json)))
+      .catch((e: unknown) => setError(String(e)));
   }, []);
 
   return (
-      <main>
-        <h1>Stromblick</h1>
-        {error && <p>API error: {error}</p>}
-        {health && <p>API status: {health.status} ({health.service})</p>}
-      </main>
+    <main>
+      <h1>Stromblick</h1>
+      {error && <p>API error: {error}</p>}
+      {health && (
+        <p>
+          API status: {health.status} ({health.service})
+        </p>
+      )}
+    </main>
   );
 }
