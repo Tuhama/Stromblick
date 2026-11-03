@@ -5,7 +5,7 @@ import App from "./App.tsx";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
-    throw new Error('Root element "#root" not found in index.html');
+  throw new Error('Root element "#root" not found in index.html');
 }
 createRoot(rootElement).render(
   <StrictMode>
