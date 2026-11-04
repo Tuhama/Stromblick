@@ -48,7 +48,11 @@ export default defineConfig([
     files: ["**/*.{js,mjs,cjs}"],
     extends: [tseslint.configs.disableTypeChecked],
   },
-
+  {
+    files: ["**/*.{js,mjs,cjs}"],
+    languageOptions: { globals: globals.node },
+    extends: [tseslint.configs.disableTypeChecked],
+  },
   // Last: turn off rules that conflict with Prettier
   prettier,
 ]);
