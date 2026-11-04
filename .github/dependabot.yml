@@ -1,0 +1,51 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    cooldown:
+      default-days: 7
+      semver-major-days: 14
+      semver-minor-days: 7
+      semver-patch-days: 3
+    ignore:
+      # Root "typescript" is the 6.x alias for typescript-eslint; don't bump it to 7.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+    groups:
+      lint-and-format:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+          - "typescript-eslint"
+          - "prettier*"
+          - "@commitlint/*"
+          - "husky"
+          - "lint-staged"
+          - "globals"
+        update-types: ["minor", "patch"]
+      build-and-test:
+        patterns: ["vite", "@vitejs/*", "turbo", "tsdown", "tsx", "vitest"]
+        update-types: ["minor", "patch"]
+      types:
+        patterns: ["@types/*"]
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
+    commit-message:
+      prefix: "ci"
+    cooldown:
+      default-days: 7
