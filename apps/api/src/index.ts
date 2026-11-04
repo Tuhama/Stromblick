@@ -1,14 +1,24 @@
-import express from "express";
-import { HealthResponse } from "@stromblick/shared";
+import { existsSync } from "node:fs";
+import { createApp } from "./app";
+import { loadEnv } from "./env";
+import { createLogger } from "./logger";
 
-const app = express();
-const port = Number(process.env.PORT ?? 3001);
+// Local development reads apps/api/.env; in production the platform sets real env vars.
+if (existsSync(".env")) process.loadEnvFile(".env");
 
-app.get("/", (_req, res) => {
-  const body: HealthResponse = { status: "ok", service: "api" };
-  res.json(HealthResponse.parse(body));
+const env = loadEnv();
+const logger = createLogger(env);
+const app = createApp({ logger, corsOrigins: env.CORS_ORIGINS });
+
+const server = app.listen(env.PORT, () => {
+  logger.info(`API listening on http://localhost:${String(env.PORT)}`);
 });
 
-app.listen(port, () => {
-  console.log(`API listening on http://localhost:${port}`);
-});
+// Railway sends SIGTERM before replacing a deployment: finish open requests, then exit.
+function shutdown(signal: NodeJS.Signals) {
+  logger.info({ signal }, "Shutting down");
+  server.close(() => process.exit(0));
+  setTimeout(() => process.exit(1), 10_000).unref();
+}
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
