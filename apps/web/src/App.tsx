@@ -6,7 +6,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/")
+    fetch("/api/health")
       .then((res) => res.json())
       .then((json: unknown) => setHealth(HealthResponse.parse(json)))
       .catch((e: unknown) => setError(String(e)));
