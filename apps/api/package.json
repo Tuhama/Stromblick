@@ -4,13 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "node --watch --import tsx src/index.ts",
     "build": "tsdown",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "catalog:",
+    "@prisma/client": "catalog:",
     "@stromblick/shared": "workspace:*",
     "cors": "^2.8.6",
     "express": "^5.3.0",
@@ -22,9 +25,10 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/node": "^26.6.5",
+    "@types/node": "catalog:",
     "@types/supertest": "^7.2.1",
     "pino-pretty": "^13.2.0",
+    "prisma": "catalog:",
     "supertest": "^7.3.1",
     "tsdown": "^0.23.4",
     "tsx": "^4.23.15",

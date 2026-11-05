@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SeriesKind {
+  GENERATION
+  PRICE
+  LOAD
+
+  @@map("series_kind")
+}
+
+enum Resolution {
+  QUARTERHOUR
+  HOUR
+  DAY
+
+  @@map("resolution")
+}
+
+enum IngestStatus {
+  RUNNING
+  SUCCEEDED
+  FAILED
+
+  @@map("ingest_status")
+}
+
+/// One SMARD time series, e.g. day-ahead price or wind offshore generation.
+model Series {
+  /// SMARD's own filter ID, e.g. 4169 for the day-ahead price.
+  id       Int        @id
+  /// Stable key used in the API and URLs, e.g. "price-day-ahead".
+  key      String     @unique
+  nameEn   String     @map("name_en")
+  nameDe   String     @map("name_de")
+  unit     String
+  kind     SeriesKind
+  readings Reading[]
+
+  @@map("series")
+}
+
+/// One value of one series at one point in time.
+model Reading {
+  seriesId   Int        @map("series_id")
+  region     String     @db.VarChar(16)
+  resolution Resolution
+  /// Start of the interval, stored in UTC.
+  ts         DateTime   @db.Timestamptz(3)
+  value      Float
+  series     Series     @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+
+  @@id([seriesId, region, resolution, ts])
+  @@map("readings")
+}
+
+/// One run of the ingestion job: proof that the data is fresh, or why it isn't.
+model IngestRun {
+  id          Int          @id @default(autoincrement())
+  startedAt   DateTime     @default(now()) @map("started_at") @db.Timestamptz(3)
+  finishedAt  DateTime?    @map("finished_at") @db.Timestamptz(3)
+  status      IngestStatus @default(RUNNING)
+  rowsWritten Int          @default(0) @map("rows_written")
+  error       String?
+
+  @@index([startedAt(sort: Desc)])
+  @@map("ingest_runs")
+}

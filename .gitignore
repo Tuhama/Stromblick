@@ -153,3 +153,5 @@ vite.config.ts.timestamp-*
 
 .claude/settings.local.json
 CLAUDE.local.md
+
+apps/api/src/generated/

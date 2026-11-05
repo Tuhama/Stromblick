@@ -8,7 +8,12 @@ import { createApp } from "./app";
 import { errorHandler } from "./middleware/error-handler";
 
 const logger = pino({ level: "silent" });
-const app = createApp({ logger, corsOrigins: ["http://localhost:5173"] });
+const databaseUp = () => Promise.resolve();
+const app = createApp({
+  logger,
+  corsOrigins: ["http://localhost:5173"],
+  checkDatabase: databaseUp,
+});
 
 describe("GET /health", () => {
   it("returns ok with a request id", async () => {
@@ -70,5 +75,17 @@ describe("errors", () => {
     const res = await request(broken).get("/boom");
     expect(res.status).toBe(500);
     expect(JSON.stringify(res.body)).not.toContain("secret internals");
+  });
+
+  it("returns 503 problem details when the database is down", async () => {
+    const appWithoutDb = createApp({
+      logger,
+      corsOrigins: [],
+      checkDatabase: () => Promise.reject(new Error("connection refused")),
+    });
+    const res = await request(appWithoutDb).get("/health");
+    expect(res.status).toBe(503);
+    expect(ProblemDetails.parse(res.body)).toMatchObject({ title: "Service Unavailable" });
+    expect(JSON.stringify(res.body)).not.toContain("connection refused");
   });
 });

@@ -12,9 +12,11 @@ const REQUEST_ID_HEADER = "x-request-id";
 export interface AppOptions {
   logger: Logger;
   corsOrigins: string[];
+  /** Resolves when the database answers; rejects when it doesn't. */
+  checkDatabase: () => Promise<void>;
 }
 
-export function createApp({ logger, corsOrigins }: AppOptions) {
+export function createApp({ logger, corsOrigins, checkDatabase }: AppOptions) {
   const app = express();
 
   // Behind Railway's proxy, so req.ip is the client, not the proxy.
@@ -51,7 +53,7 @@ export function createApp({ logger, corsOrigins }: AppOptions) {
   app.use(cors({ origin: corsOrigins, exposedHeaders: [REQUEST_ID_HEADER] }));
   app.use(express.json({ limit: "100kb" }));
 
-  app.use(healthRouter);
+  app.use(healthRouter(checkDatabase));
 
   app.use(notFound);
   app.use(errorHandler);
