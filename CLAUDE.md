@@ -39,3 +39,5 @@ pnpm + Turborepo monorepo:
 
 - The root `typescript` is the 6.x compatibility package for typescript-eslint; packages use TypeScript 7 for tsc.
 - pnpm blocks dependency install scripts; approvals live in pnpm-workspace.yaml.
+- apps/api dev uses `node --watch --import tsx`, not `tsx watch`. On Windows, `tsx watch` hangs
+  silently at startup when its stdin is an open pipe, which is how Turborepo runs tasks.

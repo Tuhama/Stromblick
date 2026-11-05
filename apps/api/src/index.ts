@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { createApp } from "./app";
+import { createDb } from "./db";
 import { loadEnv } from "./env";
 import { createLogger } from "./logger";
 
@@ -8,7 +9,14 @@ if (existsSync(".env")) process.loadEnvFile(".env");
 
 const env = loadEnv();
 const logger = createLogger(env);
-const app = createApp({ logger, corsOrigins: env.CORS_ORIGINS });
+const db = createDb(env.DATABASE_URL);
+const app = createApp({
+  logger,
+  corsOrigins: env.CORS_ORIGINS,
+  checkDatabase: async () => {
+    await db.$queryRaw`SELECT 1`;
+  },
+});
 
 const server = app.listen(env.PORT, () => {
   logger.info(`API listening on http://localhost:${String(env.PORT)}`);
@@ -17,7 +25,9 @@ const server = app.listen(env.PORT, () => {
 // Railway sends SIGTERM before replacing a deployment: finish open requests, then exit.
 function shutdown(signal: NodeJS.Signals) {
   logger.info({ signal }, "Shutting down");
-  server.close(() => process.exit(0));
+  server.close(() => {
+    void db.$disconnect().finally(() => process.exit(0));
+  });
   setTimeout(() => process.exit(1), 10_000).unref();
 }
 process.on("SIGTERM", shutdown);
