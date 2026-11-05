@@ -8,8 +8,7 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import prettier from "eslint-config-prettier";
 
 export default defineConfig([
-  globalIgnores(["**/dist/**", "**/.turbo/**", "**/coverage/**"]),
-
+  globalIgnores(["**/dist/**", "**/.turbo/**", "**/coverage/**", "**/generated/**"]),
   // All packages: strict, type-aware TypeScript rules
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,

@@ -19,6 +19,11 @@ updates:
       # Root "typescript" is the 6.x alias for typescript-eslint; don't bump it to 7.
       - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
+      # Prisma 8 is a rewrite; upgrade deliberately, not via Dependabot.
+      - dependency-name: "prisma"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@prisma/*"
+        update-types: ["version-update:semver-major"]
     groups:
       lint-and-format:
         patterns:
