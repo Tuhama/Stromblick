@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { HealthResponse } from "@stromblick/shared";
 import { HttpError } from "../errors";
+import { sendJson } from "../respond";
 
 export function healthRouter(checkDatabase: () => Promise<void>) {
   const router = Router();
@@ -12,7 +13,7 @@ export function healthRouter(checkDatabase: () => Promise<void>) {
       req.log.warn({ err }, "Database check failed");
       throw new HttpError(503, "Database unreachable");
     }
-    res.json(HealthResponse.parse({ status: "ok", service: "api", database: "ok" }));
+    sendJson(res, HealthResponse, { status: "ok", service: "api", database: "ok" });
   });
 
   return router;
