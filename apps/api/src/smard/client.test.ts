@@ -1,7 +1,7 @@
-import { readFile } from "node:fs/promises";
-import { describe, expect, it, vi } from "vitest";
-import { SMARD_BASE_URL, SmardError, createSmardClient, weeksSince } from "./client";
+import { describe, expect, it } from "vitest";
+import { SmardError, createSmardClient, weeksSince } from "./client";
 import type { SmardSource } from "./catalog";
+import { createFixtureFetch, readFixture } from "./fixture-fetch";
 
 const price: SmardSource = { filter: 4169, region: "DE-LU", resolution: "quarterhour" };
 const solar: SmardSource = { filter: 4068, region: "DE", resolution: "hour" };
@@ -11,25 +11,7 @@ const WEEK_OF_19_OCT = 1_792_360_800_000; // clocks went back on Sunday 25 Octob
 const WEEK_OF_26_OCT = 1_792_969_200_000;
 const WEEK_OF_2_NOV = 1_793_574_000_000; // recorded before Sunday's prices were published
 
-const FIXTURES = new URL("./fixtures/", import.meta.url);
-
-/** Answers each SMARD URL with the recorded file at the same path under fixtures/. */
-const fixtureFetch = vi.fn<typeof fetch>(async (input) => {
-  if (typeof input !== "string") throw new TypeError("The SMARD client fetches URL strings");
-  const path = input.slice(`${SMARD_BASE_URL}/`.length);
-  try {
-    const body = await readFile(new URL(path, FIXTURES), "utf8");
-    return new Response(body, { headers: { "Content-Type": "application/json" } });
-  } catch {
-    return new Response("Not Found", { status: 404 });
-  }
-});
-
-async function readFixture(path: string): Promise<{ series: [number, number | null][] }> {
-  return JSON.parse(await readFile(new URL(path, FIXTURES), "utf8")) as {
-    series: [number, number | null][];
-  };
-}
+const fixtureFetch = createFixtureFetch();
 
 /** A client whose fetch always answers with `response`. */
 function clientAnswering(response: Response) {

@@ -17,8 +17,22 @@ jobs:
     name: verify
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # A real Postgres for the database tests. Same version as local Docker and Neon.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: stromblick
+          POSTGRES_PASSWORD: stromblick
+          POSTGRES_DB: stromblick_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U stromblick -d stromblick_test"
+          --health-interval 2s --health-timeout 3s --health-retries 15
     env:
       HUSKY: 0
+      TEST_DATABASE_URL: postgresql://stromblick:stromblick@localhost:5432/stromblick_test
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -30,5 +44,8 @@ jobs:
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck
+      - run: pnpm --filter @stromblick/api exec prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
       - run: pnpm test
       - run: pnpm build
