@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { loadEnv } from "./env";
+import { loadEnv, loadScriptEnv } from "./env";
 
 const DATABASE_URL = "postgresql://user:pass@localhost:5432/db";
 const INGEST_SECRET = "a".repeat(32);
@@ -32,5 +32,19 @@ describe("loadEnv", () => {
   it("requires an ingest secret of at least 32 characters", () => {
     expect(() => loadEnv({ DATABASE_URL })).toThrow(/INGEST_SECRET/);
     expect(() => loadEnv({ DATABASE_URL, INGEST_SECRET: "too-short" })).toThrow(/INGEST_SECRET/);
+  });
+});
+
+describe("loadScriptEnv", () => {
+  it("needs only DATABASE_URL", () => {
+    expect(loadScriptEnv({ DATABASE_URL })).toEqual({
+      NODE_ENV: "development",
+      LOG_LEVEL: "info",
+      DATABASE_URL,
+    });
+  });
+
+  it("still requires a postgres DATABASE_URL", () => {
+    expect(() => loadScriptEnv({})).toThrow(/DATABASE_URL/);
   });
 });
