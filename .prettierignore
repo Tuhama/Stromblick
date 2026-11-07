@@ -1,1 +1,4 @@
 pnpm-lock.yaml
+
+# Recorded SMARD responses stay byte-for-byte as SMARD sent them
+apps/api/src/smard/fixtures/
