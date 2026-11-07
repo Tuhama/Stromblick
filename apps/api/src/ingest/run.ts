@@ -38,6 +38,8 @@ export interface IngestOptions {
   smard: SmardClient;
   logger: Logger;
   now?: () => Date;
+  /** Fetch every week with data at or after this moment. Default: yesterday, see below. */
+  since?: Date;
   series?: readonly SmardSeries[];
 }
 
@@ -50,6 +52,8 @@ export async function runIngest({
   smard,
   logger,
   now = () => new Date(),
+  // From yesterday on: on Mondays, Sunday's last values are still in the previous week's file.
+  since = new Date(now().getTime() - DAY_MS),
   series = SMARD_SERIES,
 }: IngestOptions): Promise<IngestResult> {
   const run = await db.ingestRun.create({ data: {} });
@@ -58,12 +62,12 @@ export async function runIngest({
 
   try {
     await upsertSeries(db, series);
-    // From yesterday on: on Mondays, Sunday's last values are still in the previous week's file.
-    const since = now().getTime() - DAY_MS;
 
     for (const item of series) {
       try {
-        rowsWritten += await ingestSeries(db, smard, item, since);
+        const written = await ingestSeries(db, smard, item, since.getTime());
+        logger.info({ series: item.key, rowsWritten: written }, "Ingested series");
+        rowsWritten += written;
       } catch (err) {
         logger.warn({ err, series: item.key }, "Ingesting a series failed");
         failures.push({ series: item.key, error: messageOf(err) });
