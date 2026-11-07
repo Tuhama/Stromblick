@@ -21,10 +21,22 @@ const EnvSchema = z.object({
 
 export type Env = z.infer<typeof EnvSchema>;
 
-export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
-  const result = EnvSchema.safeParse(source);
+/** Command-line scripts (e.g. the backfill) only log and talk to the database. */
+const ScriptEnvSchema = EnvSchema.pick({ NODE_ENV: true, LOG_LEVEL: true, DATABASE_URL: true });
+export type ScriptEnv = z.infer<typeof ScriptEnvSchema>;
+
+function parseEnv<S extends z.ZodType>(schema: S, source: NodeJS.ProcessEnv): z.output<S> {
+  const result = schema.safeParse(source);
   if (!result.success) {
     throw new Error(`Invalid environment variables:\n${z.prettifyError(result.error)}`);
   }
   return result.data;
+}
+
+export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
+  return parseEnv(EnvSchema, source);
+}
+
+export function loadScriptEnv(source: NodeJS.ProcessEnv = process.env): ScriptEnv {
+  return parseEnv(ScriptEnvSchema, source);
 }

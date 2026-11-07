@@ -1,8 +1,8 @@
 import { pino } from "pino";
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createDb } from "../db";
 import { SMARD_SERIES } from "../smard/catalog";
-import { createSmardClient } from "../smard/client";
+import { SMARD_BASE_URL, createSmardClient } from "../smard/client";
 import { createFixtureFetch } from "../smard/fixture-fetch";
 import { runIngest } from "./run";
 
@@ -17,6 +17,23 @@ const priceAndSolar = SMARD_SERIES.filter((series) =>
 // 6 November 2026, 13:00 in Berlin: the recorded week of 2 November is the latest one.
 const now = () => new Date("2026-11-06T12:00:00Z");
 const PUBLISHED_SLOTS = 576; // Monday to Saturday at 96 slots a day; Sunday was still open
+
+const WEEK_OF_19_OCT = Date.parse("2026-10-19T00:00:00+02:00");
+const WEEK_OF_2_NOV = Date.parse("2026-11-02T00:00:00+01:00");
+const PRICE_INDEX_URL = `${SMARD_BASE_URL}/chart_data/4169/DE-LU/index_quarterhour.json`;
+
+/**
+ * The recorded fixtures, but with an index that lists only the two recorded price weeks,
+ * so a backfill from 19 October finds a file for every week it asks for.
+ */
+function twoRecordedWeeks() {
+  const fixtureFetch = createFixtureFetch();
+  return vi.fn<typeof fetch>((input, init) =>
+    input === PRICE_INDEX_URL
+      ? Promise.resolve(Response.json({ timestamps: [WEEK_OF_19_OCT, WEEK_OF_2_NOV] }))
+      : fixtureFetch(input, init),
+  );
+}
 
 describe.skipIf(url === undefined)("runIngest (database)", () => {
   const db = createDb(url ?? "");
@@ -76,7 +93,21 @@ describe.skipIf(url === undefined)("runIngest (database)", () => {
     });
     expect(reading?.value).toBe(250.96);
   });
+  it("backfills every week since `since`, and a re-run changes nothing", async () => {
+    const backfill = () =>
+      runIngest({
+        db,
+        smard: createSmardClient({ fetch: twoRecordedWeeks() }),
+        logger,
+        since: new Date(WEEK_OF_19_OCT),
+        series: price,
+      });
 
+    // 676 slots in the week the clocks went back, plus the 576 published in the latest week.
+    expect(await backfill()).toMatchObject({ status: "SUCCEEDED", rowsWritten: 676 + 576 });
+    expect(await backfill()).toMatchObject({ status: "SUCCEEDED", rowsWritten: 0 });
+    expect(await db.reading.count()).toBe(676 + 576);
+  });
   it("records a failed series and still writes the others", async () => {
     // Solar's index wasn't recorded, so the fake SMARD answers 404 for it.
     const result = await ingest(priceAndSolar);
