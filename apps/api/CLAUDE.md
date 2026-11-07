@@ -6,3 +6,4 @@
 - Database access only through Prisma. Schema changes only via new migrations; never edit applied ones.
 - Ingestion is idempotent (upserts) and records every run in ingest_runs.
 - Log with the request logger (Pino), not console.log.
+- Tests never call SMARD. Record responses with curl into src/smard/fixtures/, at the same path as the SMARD URL after /app/.
