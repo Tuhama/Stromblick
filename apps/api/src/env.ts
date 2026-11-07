@@ -5,6 +5,8 @@ const EnvSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3001),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
   DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+  // Bearer secret for POST /ingest. Generate one with: openssl rand -hex 32
+  INGEST_SECRET: z.string().min(32, "Use at least 32 random characters (openssl rand -hex 32)"),
   CORS_ORIGINS: z
     .string()
     .default("http://localhost:5173")
