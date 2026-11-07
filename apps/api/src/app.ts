@@ -6,6 +6,7 @@ import { pinoHttp } from "pino-http";
 import type { Logger } from "pino";
 import { healthRouter } from "./routes/health";
 import { errorHandler, notFound } from "./middleware/error-handler";
+import { ingestRouter, type IngestRouteOptions } from "./routes/ingest";
 
 const REQUEST_ID_HEADER = "x-request-id";
 
@@ -14,9 +15,11 @@ export interface AppOptions {
   corsOrigins: string[];
   /** Resolves when the database answers; rejects when it doesn't. */
   checkDatabase: () => Promise<void>;
+  /** The bearer secret for POST /ingest, and the job it starts. */
+  ingest: IngestRouteOptions;
 }
 
-export function createApp({ logger, corsOrigins, checkDatabase }: AppOptions) {
+export function createApp({ logger, corsOrigins, checkDatabase, ingest }: AppOptions) {
   const app = express();
 
   // Behind Railway's proxy, so req.ip is the client, not the proxy.
@@ -54,7 +57,7 @@ export function createApp({ logger, corsOrigins, checkDatabase }: AppOptions) {
   app.use(express.json({ limit: "100kb" }));
 
   app.use(healthRouter(checkDatabase));
-
+  app.use(ingestRouter(ingest));
   app.use(notFound);
   app.use(errorHandler);
   return app;

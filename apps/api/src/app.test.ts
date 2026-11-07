@@ -9,10 +9,18 @@ import { errorHandler } from "./middleware/error-handler";
 
 const logger = pino({ level: "silent" });
 const databaseUp = () => Promise.resolve();
+
+// POST /ingest has its own tests in routes/ingest.test.ts.
+const ingest = {
+  secret: "x".repeat(32),
+  run: () => Promise.reject(new Error("not used in these tests")),
+};
+
 const app = createApp({
   logger,
   corsOrigins: ["http://localhost:5173"],
   checkDatabase: databaseUp,
+  ingest,
 });
 
 describe("GET /health", () => {
@@ -82,6 +90,7 @@ describe("errors", () => {
       logger,
       corsOrigins: [],
       checkDatabase: () => Promise.reject(new Error("connection refused")),
+      ingest,
     });
     const res = await request(appWithoutDb).get("/health");
     expect(res.status).toBe(503);

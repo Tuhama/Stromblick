@@ -2,7 +2,9 @@ import { existsSync } from "node:fs";
 import { createApp } from "./app";
 import { createDb } from "./db";
 import { loadEnv } from "./env";
+import { runIngest } from "./ingest/run";
 import { createLogger } from "./logger";
+import { createSmardClient } from "./smard/client";
 
 // Local development reads apps/api/.env; in production the platform sets real env vars.
 if (existsSync(".env")) process.loadEnvFile(".env");
@@ -10,11 +12,16 @@ if (existsSync(".env")) process.loadEnvFile(".env");
 const env = loadEnv();
 const logger = createLogger(env);
 const db = createDb(env.DATABASE_URL);
+const smard = createSmardClient();
 const app = createApp({
   logger,
   corsOrigins: env.CORS_ORIGINS,
   checkDatabase: async () => {
     await db.$queryRaw`SELECT 1`;
+  },
+  ingest: {
+    secret: env.INGEST_SECRET,
+    run: () => runIngest({ db, smard, logger }),
   },
 });
 
