@@ -14,6 +14,7 @@ function appWithIngest(result: IngestResult) {
     corsOrigins: [],
     checkDatabase: () => Promise.resolve(),
     ingest: { secret: SECRET, run },
+    readings: () => Promise.resolve([]),
   });
   return { app, run };
 }
