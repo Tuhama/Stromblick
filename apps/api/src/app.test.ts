@@ -15,12 +15,15 @@ const ingest = {
   secret: "x".repeat(32),
   run: () => Promise.reject(new Error("not used in these tests")),
 };
+// GET /series and its readings have their own tests in routes/series.test.ts.
+const readings = () => Promise.resolve([]);
 
 const app = createApp({
   logger,
   corsOrigins: ["http://localhost:5173"],
   checkDatabase: databaseUp,
   ingest,
+  readings,
 });
 
 describe("GET /health", () => {
@@ -91,6 +94,7 @@ describe("errors", () => {
       corsOrigins: [],
       checkDatabase: () => Promise.reject(new Error("connection refused")),
       ingest,
+      readings,
     });
     const res = await request(appWithoutDb).get("/health");
     expect(res.status).toBe(503);

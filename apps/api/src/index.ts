@@ -4,6 +4,7 @@ import { createDb } from "./db";
 import { loadEnv } from "./env";
 import { runIngest } from "./ingest/run";
 import { createLogger } from "./logger";
+import { loadReadings } from "./series/load-readings";
 import { createSmardClient } from "./smard/client";
 
 // Local development reads apps/api/.env; in production the platform sets real env vars.
@@ -23,6 +24,7 @@ const app = createApp({
     secret: env.INGEST_SECRET,
     run: () => runIngest({ db, smard, logger }),
   },
+  readings: (request) => loadReadings(db, request),
 });
 
 const server = app.listen(env.PORT, () => {
