@@ -41,3 +41,5 @@ pnpm + Turborepo monorepo:
 - pnpm blocks dependency install scripts; approvals live in pnpm-workspace.yaml.
 - apps/api dev uses `node --watch --import tsx`, not `tsx watch`. On Windows, `tsx watch` hangs
   silently at startup when its stdin is an open pipe, which is how Turborepo runs tasks.
+- `prisma` is a production dependency of apps/api on purpose: the Docker image runs `prisma migrate deploy` before each release.
+- In production the API uses DATABASE_URL (sslmode=verify-full); the Prisma CLI uses MIGRATE_DATABASE_URL (sslmode=require).
