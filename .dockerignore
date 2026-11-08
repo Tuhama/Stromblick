@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+**/.turbo
+**/src/generated
+**/.env
+**/.env.*
+!**/.env.example
+**/*.log
+.git
+.github
+.husky
+.idea
+.claude
