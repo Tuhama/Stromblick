@@ -1,0 +1,47 @@
+name: Ingest SMARD
+
+on:
+  schedule:
+    # Every hour at :17 (UTC). Off the full hour, when GitHub's scheduler is busiest.
+    - cron: "19 * * * *"
+  # A "Run workflow" button, for testing and for catching up by hand.
+  workflow_dispatch:
+
+# Never run two ingests at once; a new run waits for the previous one.
+concurrency:
+  group: ingest
+  cancel-in-progress: false
+
+# The job only calls the API, so it needs no access to the repository.
+permissions: {}
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Run the ingest
+        env:
+          API_URL: ${{ vars.API_URL }}
+          INGEST_SECRET: ${{ secrets.INGEST_SECRET }}
+        run: |
+          status=0
+          curl --silent --show-error --fail-with-body \
+            --max-time 300 --retry 2 --retry-delay 60 \
+            --request POST \
+            --header "Authorization: Bearer $INGEST_SECRET" \
+            --output response.json \
+            "$API_URL/ingest" || status=$?
+
+          body=$(cat response.json 2>/dev/null || true)
+          echo "$body"
+
+          if [ "$status" -eq 0 ]; then
+            summary=$(echo "$body" | jq -r '"Ingest run \(.runId) succeeded: \(.rowsWritten) rows written."')
+          else
+            detail=$(echo "$body" | jq -r '.detail // .title // empty' 2>/dev/null || true)
+            summary="Ingest failed (curl exit code $status): ${detail:-no usable response from the API}"
+          fi
+          echo "$summary"
+          echo "$summary" >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
