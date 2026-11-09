@@ -1,0 +1,52 @@
+{
+  "app": {
+    "name": "Stromblick",
+    "tagline": "Der deutsche Strommarkt, live",
+    "skipToContent": "Zum Inhalt springen"
+  },
+  "nav": {
+    "label": "Hauptnavigation",
+    "overview": "Überblick",
+    "tomorrow": "Morgen",
+    "explorer": "Explorer",
+    "explain": "Tag erklären"
+  },
+  "language": {
+    "label": "Sprache",
+    "en": "English",
+    "de": "Deutsch"
+  },
+  "theme": {
+    "label": "Farbschema",
+    "system": "System",
+    "light": "Hell",
+    "dark": "Dunkel"
+  },
+  "overview": {
+    "title": "Überblick",
+    "intro": "Der heutige Strommix, die Preise und der Anteil erneuerbarer Energien.",
+    "apiStatus": "API-Status: {{status}}",
+    "apiError": "Die API ist gerade nicht erreichbar."
+  },
+  "tomorrow": {
+    "title": "Morgen",
+    "intro": "Die Day-Ahead-Preise für morgen und die günstigsten Stunden für den Stromverbrauch."
+  },
+  "explorer": {
+    "title": "Explorer",
+    "intro": "Jede Datenreihe in jedem Zeitraum, per Link teilbar."
+  },
+  "explain": {
+    "title": "Tag erklären",
+    "intro": "Wähle einen Tag und erhalte eine Erklärung, was am Strommarkt passiert ist."
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "text": "Diese Seite gibt es nicht.",
+    "home": "Zurück zum Überblick"
+  },
+  "error": {
+    "title": "Etwas ist schiefgelaufen",
+    "text": "Die Seite konnte nicht angezeigt werden. Bitte lade sie neu."
+  }
+}

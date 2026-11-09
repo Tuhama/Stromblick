@@ -1,0 +1,52 @@
+{
+  "app": {
+    "name": "Stromblick",
+    "tagline": "Germany's electricity market, live",
+    "skipToContent": "Skip to content"
+  },
+  "nav": {
+    "label": "Main",
+    "overview": "Overview",
+    "tomorrow": "Tomorrow",
+    "explorer": "Explorer",
+    "explain": "Explain a day"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "de": "Deutsch"
+  },
+  "theme": {
+    "label": "Color theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "overview": {
+    "title": "Overview",
+    "intro": "Today's generation mix, prices and renewable share.",
+    "apiStatus": "API status: {{status}}",
+    "apiError": "The API is not reachable right now."
+  },
+  "tomorrow": {
+    "title": "Tomorrow",
+    "intro": "Tomorrow's day-ahead prices and the cheapest hours to use electricity."
+  },
+  "explorer": {
+    "title": "Explorer",
+    "intro": "Any series over any time range, shareable by link."
+  },
+  "explain": {
+    "title": "Explain a day",
+    "intro": "Pick a day and get an explanation of what happened on the electricity market."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "text": "This page doesn't exist.",
+    "home": "Back to the overview"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "text": "The page could not be shown. Try reloading it."
+  }
+}
