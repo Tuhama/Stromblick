@@ -34,6 +34,7 @@ pnpm + Turborepo monorepo:
 - One issue = one branch = one PR. Conventional Commits (feat:, fix:, chore:, ci:, docs:, test:).
 - Done means pnpm lint, typecheck, test and build all pass.
 - Never read or edit .env files (only .env.example). Never push without asking.
+- A pull request that makes a significant decision adds a record in docs/adr (see docs/adr/README.md).
 
 ## Setup details (intentional, don't "fix")
 
