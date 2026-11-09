@@ -46,12 +46,13 @@ export default defineConfig([
   // Plain JS config files are in no tsconfig, so lint them without type info
   {
     files: ["**/*.{js,mjs,cjs}"],
-    extends: [tseslint.configs.disableTypeChecked],
-  },
-  {
-    files: ["**/*.{js,mjs,cjs}"],
     languageOptions: { globals: globals.node },
     extends: [tseslint.configs.disableTypeChecked],
+  },
+  // Web: scripts in public/ are served as they are and run in the browser
+  {
+    files: ["apps/web/public/**/*.js"],
+    languageOptions: { globals: globals.browser },
   },
   // Last: turn off rules that conflict with Prettier
   prettier,
