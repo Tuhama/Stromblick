@@ -1,7 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { createBrowserRouter } from "react-router";
+import { RouterProvider } from "react-router/dom";
 import "./index.css";
-import App from "./App.tsx";
+import { initI18n } from "./i18n";
+import { routes } from "./routes/routes";
+
+initI18n();
+const router = createBrowserRouter(routes);
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -9,6 +15,6 @@ if (!rootElement) {
 }
 createRoot(rootElement).render(
   <StrictMode>
-    <App />
+    <RouterProvider router={router} />
   </StrictMode>,
 );
