@@ -62,6 +62,8 @@ describe("singleFlight", () => {
     work.reject(new Error("smard is down"));
     await expect(failing).rejects.toThrow("smard is down");
 
-    expect(flight.runIfIdle()).not.toBeNull();
+    const next = flight.runIfIdle();
+    expect(next).not.toBeNull();
+    await expect(next).rejects.toThrow("smard is down");
   });
 });
