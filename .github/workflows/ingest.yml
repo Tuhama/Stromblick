@@ -1,9 +1,11 @@
 name: Ingest SMARD
 
+# The API ingests on its own timer (INGEST_INTERVAL_MINUTES on Railway); see ADR 0004.
+# This workflow is the backup and the manual button, not the primary schedule.
 on:
   schedule:
-    # Every hour at :17 (UTC). Off the full hour, when GitHub's scheduler is busiest.
-    - cron: "19 * * * *"
+    # Every six hours at :19 (UTC). GitHub drops many slots, which is fine for a backup.
+    - cron: "19 */6 * * *"
   # A "Run workflow" button, for testing and for catching up by hand.
   workflow_dispatch:
 
