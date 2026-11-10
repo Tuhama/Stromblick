@@ -17,6 +17,8 @@ const ingest = {
 };
 // GET /series and its readings have their own tests in routes/series.test.ts.
 const readings = () => Promise.resolve([]);
+// GET /status has its own tests in routes/status.test.ts.
+const status = () => Promise.resolve({ lastSuccessAt: null, lastRun: null });
 
 const app = createApp({
   logger,
@@ -24,6 +26,7 @@ const app = createApp({
   checkDatabase: databaseUp,
   ingest,
   readings,
+  status,
 });
 
 describe("GET /health", () => {
@@ -95,6 +98,7 @@ describe("errors", () => {
       checkDatabase: () => Promise.reject(new Error("connection refused")),
       ingest,
       readings,
+      status,
     });
     const res = await request(appWithoutDb).get("/health");
     expect(res.status).toBe(503);

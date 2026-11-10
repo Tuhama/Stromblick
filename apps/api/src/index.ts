@@ -8,6 +8,7 @@ import { startIngestTimer } from "./ingest/timer";
 import { createLogger } from "./logger";
 import { loadReadings } from "./series/load-readings";
 import { createSmardClient } from "./smard/client";
+import { loadStatus } from "./status/load-status";
 
 // Local development reads apps/api/.env; in production the platform sets real env vars.
 if (existsSync(".env")) process.loadEnvFile(".env");
@@ -29,6 +30,7 @@ const app = createApp({
     run: ingest.run,
   },
   readings: (request) => loadReadings(db, request),
+  status: () => loadStatus(db),
 });
 
 const stopIngestTimer =

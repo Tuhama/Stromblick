@@ -23,6 +23,7 @@ function appWithReadings(points: Point[] = POINTS) {
     checkDatabase: () => Promise.resolve(),
     ingest: { secret: "x".repeat(32), run: () => Promise.reject(new Error("not used")) },
     readings,
+    status: () => Promise.resolve({ lastSuccessAt: null, lastRun: null }),
   });
   return { app, readings };
 }

@@ -15,6 +15,7 @@ function appWithIngest(result: IngestResult) {
     checkDatabase: () => Promise.resolve(),
     ingest: { secret: SECRET, run },
     readings: () => Promise.resolve([]),
+    status: () => Promise.resolve({ lastSuccessAt: null, lastRun: null }),
   });
   return { app, run };
 }
