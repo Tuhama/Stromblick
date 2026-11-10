@@ -7,6 +7,8 @@ const EnvSchema = z.object({
   DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
   // Bearer secret for POST /ingest. Generate one with: openssl rand -hex 32
   INGEST_SECRET: z.string().min(32, "Use at least 32 random characters (openssl rand -hex 32)"),
+  // Minutes between self-started ingest runs. Unset: the timer is off, and only POST /ingest ingests.
+  INGEST_INTERVAL_MINUTES: z.coerce.number().int().min(5).max(1440).optional(),
   CORS_ORIGINS: z
     .string()
     .default("http://localhost:5173")

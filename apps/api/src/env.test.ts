@@ -33,6 +33,22 @@ describe("loadEnv", () => {
     expect(() => loadEnv({ DATABASE_URL })).toThrow(/INGEST_SECRET/);
     expect(() => loadEnv({ DATABASE_URL, INGEST_SECRET: "too-short" })).toThrow(/INGEST_SECRET/);
   });
+
+  it("leaves the ingest timer off when no interval is set", () => {
+    // Zod omits unset optional keys, so check the value rather than the key's presence.
+    expect(loadEnv(required).INGEST_INTERVAL_MINUTES).toBeUndefined();
+    expect(loadEnv({ ...required, INGEST_INTERVAL_MINUTES: "60" }).INGEST_INTERVAL_MINUTES).toBe(
+      60,
+    );
+  });
+
+  it("rejects a broken ingest interval", () => {
+    for (const value of ["abc", "0", "4", "-60", "2000"]) {
+      expect(() =>
+        loadEnv({ DATABASE_URL, INGEST_SECRET, INGEST_INTERVAL_MINUTES: value }),
+      ).toThrow(/INGEST_INTERVAL_MINUTES/);
+    }
+  });
 });
 
 describe("loadScriptEnv", () => {
