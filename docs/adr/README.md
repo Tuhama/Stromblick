@@ -11,6 +11,7 @@ a new record supersedes the old one, and the old one's status links to it.
 | [0002](0002-aggregate-readings-in-postgres.md)  | Aggregate readings in Postgres instead of LTTB               | Accepted |
 | [0003](0003-design-tokens-before-components.md) | Design tokens now, shadcn/ui components when they are needed | Accepted |
 | [0004](0004-ingest-timer-inside-the-api.md)     | Run the ingest on a timer inside the API                     | Accepted |
+| [0005](0005-typescript-6-alias-for-linting.md)  | Alias the root `typescript` to 6.x for typescript-eslint     | Accepted |
 
 ## Adding a record
 
