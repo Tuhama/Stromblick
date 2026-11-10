@@ -6,7 +6,7 @@ A live dashboard of Germany's electricity market: 15-minute day-ahead prices, th
 tomorrow's cheapest hours and AI explanations, built on the Bundesnetzagentur's
 [SMARD](https://www.smard.de) open data.
 
-**Live:** https://stromblick-eosin.vercel.app
+**Live:** https://stromblick-de.vercel.app
 
 > **Work in progress.** The data pipeline, the API and the app shell are live. The charts come next;
 > the MVP (v0.1.0) is planned for early December 2026. Progress is tracked in the
