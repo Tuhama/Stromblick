@@ -8,7 +8,9 @@ import { healthRouter } from "./routes/health";
 import { errorHandler, notFound } from "./middleware/error-handler";
 import { ingestRouter, type IngestRouteOptions } from "./routes/ingest";
 import { seriesRouter } from "./routes/series";
+import { statusRouter } from "./routes/status";
 import type { LoadReadings } from "./series/load-readings";
+import type { LoadStatus } from "./status/load-status";
 
 const REQUEST_ID_HEADER = "x-request-id";
 
@@ -21,9 +23,18 @@ export interface AppOptions {
   ingest: IngestRouteOptions;
   /** Loads the points of one series; the database in production, a stub in tests. */
   readings: LoadReadings;
+  /** Reads when the data was last updated; the database in production, a stub in tests. */
+  status: LoadStatus;
 }
 
-export function createApp({ logger, corsOrigins, checkDatabase, ingest, readings }: AppOptions) {
+export function createApp({
+  logger,
+  corsOrigins,
+  checkDatabase,
+  ingest,
+  readings,
+  status,
+}: AppOptions) {
   const app = express();
 
   // Behind Railway's proxy, so req.ip is the client, not the proxy.
@@ -63,6 +74,7 @@ export function createApp({ logger, corsOrigins, checkDatabase, ingest, readings
   app.use(healthRouter(checkDatabase));
   app.use(ingestRouter(ingest));
   app.use(seriesRouter(readings));
+  app.use(statusRouter(status));
   app.use(notFound);
   app.use(errorHandler);
   return app;
