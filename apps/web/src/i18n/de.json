@@ -26,9 +26,22 @@
     "title": "Überblick",
     "intro": "Der heutige Strommix, die Preise und der Anteil erneuerbarer Energien.",
     "loading": "Wird geladen …",
-    "dataAsOf": "Datenstand: {{time}}",
+    "dataUpdated": "Daten aktualisiert {{ago}}",
+    "dataUpdatedNow": "Daten gerade aktualisiert",
     "noData": "Es wurden noch keine Daten geladen.",
-    "apiError": "Die API ist gerade nicht erreichbar."
+    "apiError": "Die API ist gerade nicht erreichbar.",
+    "price": {
+      "title": "Day-Ahead-Preis heute",
+      "unit": "Preiseinheit",
+      "note": "Großhandelspreis, ohne Steuern, Umlagen und Netzentgelte. Alle Uhrzeiten in deutscher Zeit ({{zone}}).",
+      "error": "Die Preise konnten nicht geladen werden.",
+      "empty": "Die heutigen Preise liegen noch nicht vor.",
+      "low": "Niedrigster",
+      "high": "Höchster",
+      "average": "Durchschnitt",
+      "at": "um {{time}}",
+      "chartLabel": "Liniendiagramm des heutigen Day-Ahead-Preises in {{unit}}. Niedrigster Preis {{low}}, höchster {{high}}."
+    }
   },
   "tomorrow": {
     "title": "Morgen",

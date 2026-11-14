@@ -2,32 +2,38 @@ import { useTranslation } from "react-i18next";
 import { useStatus } from "../../api/queries";
 import { currentLanguage } from "../../i18n";
 import { Page } from "../../layout/Page";
-
-/** The market runs on German time, so times are shown in it wherever the reader is. */
-function formatTime(iso: string, language: string): string {
-  return new Intl.DateTimeFormat(language, {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "Europe/Berlin",
-  }).format(new Date(iso));
-}
+import { berlinZoneName, formatDateTime } from "../../time/berlin";
+import { formatTimeAgo } from "../../time/relative";
+import { useNow } from "../../time/use-now";
+import { PriceToday } from "./PriceToday";
 
 export function OverviewPage() {
   const { t } = useTranslation();
   const status = useStatus();
+  const now = useNow(60_000);
+  const language = currentLanguage();
 
   let statusLine: string;
+  // The exact moment, for readers who hover the line.
+  let exactTime: string | undefined;
   if (status.isPending) statusLine = t("overview.loading");
   else if (status.isError) statusLine = t("overview.apiError");
   else if (status.data.lastSuccessAt === null) statusLine = t("overview.noData");
   else {
-    const time = formatTime(status.data.lastSuccessAt, currentLanguage());
-    statusLine = t("overview.dataAsOf", { time });
+    const updated = Date.parse(status.data.lastSuccessAt);
+    const ago = formatTimeAgo(updated, now, language);
+    statusLine = ago === null ? t("overview.dataUpdatedNow") : t("overview.dataUpdated", { ago });
+    exactTime = `${formatDateTime(updated, language)} ${berlinZoneName(updated, language)}`;
   }
 
   return (
     <Page title={t("overview.title")} intro={t("overview.intro")}>
-      <p className="text-sm text-muted-foreground">{statusLine}</p>
+      <p className="text-sm text-muted-foreground" title={exactTime}>
+        {statusLine}
+      </p>
+      <div className="mt-8">
+        <PriceToday />
+      </div>
     </Page>
   );
 }

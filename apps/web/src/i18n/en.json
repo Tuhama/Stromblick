@@ -26,9 +26,22 @@
     "title": "Overview",
     "intro": "Today's generation mix, prices and renewable share.",
     "loading": "Loading…",
-    "dataAsOf": "Data as of {{time}}",
+    "dataUpdated": "Data updated {{ago}}",
+    "dataUpdatedNow": "Data updated just now",
     "noData": "No data has been loaded yet.",
-    "apiError": "The API is not reachable right now."
+    "apiError": "The API is not reachable right now.",
+    "price": {
+      "title": "Day-ahead price today",
+      "unit": "Price unit",
+      "note": "Wholesale price, without taxes, levies and grid fees. Times are in German time ({{zone}}).",
+      "error": "The prices couldn't be loaded.",
+      "empty": "Today's prices aren't available yet.",
+      "low": "Lowest",
+      "high": "Highest",
+      "average": "Average",
+      "at": "at {{time}}",
+      "chartLabel": "Line chart of today's day-ahead price in {{unit}}. Lowest {{low}}, highest {{high}}."
+    }
   },
   "tomorrow": {
     "title": "Tomorrow",
