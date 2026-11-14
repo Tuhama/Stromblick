@@ -1,12 +1,13 @@
 import type { z } from "zod";
 import type { SmardResolution, SmardSource } from "./catalog";
+import { HOUR, MINUTE } from "../time-units";
 import { SmardIndex, SmardWeek } from "./schemas";
 
 export const SMARD_BASE_URL = "https://www.smard.de/app";
 
 const STEP_MS: Record<SmardResolution, number> = {
-  quarterhour: 15 * 60_000,
-  hour: 60 * 60_000,
+  quarterhour: 15 * MINUTE,
+  hour: HOUR,
 };
 
 /** One published value: start of the interval in epoch milliseconds (UTC), and the value. */

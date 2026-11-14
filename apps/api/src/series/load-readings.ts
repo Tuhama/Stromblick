@@ -1,4 +1,4 @@
-import type { Point, Region, Resolution } from "@stromblick/shared";
+import { MARKET_TIME_ZONE, type Point, type Region, type Resolution } from "@stromblick/shared";
 import type { Db } from "../db";
 
 export interface ReadingsRequest {
@@ -17,8 +17,6 @@ export interface ReadingsRequest {
 
 export type LoadReadings = (request: ReadingsRequest) => Promise<Point[]>;
 
-const BERLIN = "Europe/Berlin";
-
 const DB_RESOLUTION = {
   quarterhour: "QUARTERHOUR",
   hour: "HOUR",
@@ -36,7 +34,7 @@ const SECONDS = { quarterhour: 900, hour: 3600, day: 86_400 } as const satisfies
  */
 const BUCKETS = {
   hour: { unit: "hour", zone: "UTC", step: "1 hour" },
-  day: { unit: "day", zone: BERLIN, step: "1 day" },
+  day: { unit: "day", zone: MARKET_TIME_ZONE, step: "1 day" },
 } as const;
 
 interface Row {
@@ -60,8 +58,8 @@ function loadNative(db: Db, { seriesId, region, native, from, to }: ReadingsRequ
     WHERE series_id = ${seriesId}
       AND region = ${region}
       AND resolution = ${DB_RESOLUTION[native]}::resolution
-      AND ts >= (${from}::date)::timestamp AT TIME ZONE ${BERLIN}
-      AND ts < (${to}::date + 1)::timestamp AT TIME ZONE ${BERLIN}
+      AND ts >= (${from}::date)::timestamp AT TIME ZONE ${MARKET_TIME_ZONE}
+      AND ts < (${to}::date + 1)::timestamp AT TIME ZONE ${MARKET_TIME_ZONE}
     ORDER BY ts`;
 }
 
@@ -84,8 +82,8 @@ function loadAggregated(db: Db, request: ReadingsRequest) {
       WHERE series_id = ${seriesId}
         AND region = ${region}
         AND resolution = ${DB_RESOLUTION[native]}::resolution
-        AND ts >= (${from}::date)::timestamp AT TIME ZONE ${BERLIN}
-        AND ts < (${to}::date + 1)::timestamp AT TIME ZONE ${BERLIN}
+        AND ts >= (${from}::date)::timestamp AT TIME ZONE ${MARKET_TIME_ZONE}
+        AND ts < (${to}::date + 1)::timestamp AT TIME ZONE ${MARKET_TIME_ZONE}
     ) AS r
     GROUP BY bucket
     HAVING count(*) * ${SECONDS[native]}::float8

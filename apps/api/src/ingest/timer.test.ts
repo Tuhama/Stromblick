@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { MINUTE } from "../time-units";
 import { startIngestTimer } from "./timer";
-
-const MINUTE = 60_000;
 
 function testLogger() {
   return { warn: vi.fn(), error: vi.fn() };

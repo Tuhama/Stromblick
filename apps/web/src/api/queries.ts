@@ -6,9 +6,8 @@ import {
   type ReadingsQuery,
   type SeriesKey,
 } from "@stromblick/shared";
+import { MINUTE } from "../time/units";
 import { getJson } from "./client";
-
-const MINUTE = 60_000;
 
 // staleTime follows the API's Cache-Control: no refetch while the browser would answer from its cache anyway.
 

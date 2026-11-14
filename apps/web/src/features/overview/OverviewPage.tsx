@@ -4,13 +4,14 @@ import { currentLanguage } from "../../i18n";
 import { Page } from "../../layout/Page";
 import { berlinZoneName, formatDateTime } from "../../time/berlin";
 import { formatTimeAgo } from "../../time/relative";
+import { MINUTE } from "../../time/units";
 import { useNow } from "../../time/use-now";
 import { PriceToday } from "./PriceToday";
 
 export function OverviewPage() {
   const { t } = useTranslation();
   const status = useStatus();
-  const now = useNow(60_000);
+  const now = useNow(MINUTE);
   const language = currentLanguage();
 
   let statusLine: string;

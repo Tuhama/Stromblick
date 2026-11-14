@@ -1,4 +1,4 @@
-import type { Region, Series } from "@stromblick/shared";
+import { DAY_AHEAD_PRICE_KEY, type Region, type Series } from "@stromblick/shared";
 
 /** Resolutions we fetch from SMARD. Longer ones are computed by the API when it downsamples. */
 export type SmardResolution = "quarterhour" | "hour";
@@ -25,7 +25,7 @@ const generation = (key: string, filter: number, en: string, de: string): SmardS
 /** Every series Stromblick ingests. Nuclear (1224) is left out: it has been zero since April 2023. */
 export const SMARD_SERIES: readonly SmardSeries[] = [
   {
-    key: "price-day-ahead",
+    key: DAY_AHEAD_PRICE_KEY,
     kind: "price",
     unit: "EUR/MWh",
     name: { en: "Day-ahead price", de: "Day-Ahead-Preis" },

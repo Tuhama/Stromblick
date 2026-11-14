@@ -7,8 +7,7 @@ import type {
 } from "../generated/prisma/enums";
 import { SMARD_SERIES, type SmardResolution, type SmardSeries } from "../smard/catalog";
 import { weeksSince, type SmardClient, type SmardReading } from "../smard/client";
-
-const DAY_MS = 24 * 60 * 60 * 1000;
+import { DAY } from "../time-units";
 
 const DB_KIND = {
   generation: "GENERATION",
@@ -53,7 +52,7 @@ export async function runIngest({
   logger,
   now = () => new Date(),
   // From yesterday on: on Mondays, Sunday's last values are still in the previous week's file.
-  since = new Date(now().getTime() - DAY_MS),
+  since = new Date(now().getTime() - DAY),
   series = SMARD_SERIES,
 }: IngestOptions): Promise<IngestResult> {
   const run = await db.ingestRun.create({ data: {} });

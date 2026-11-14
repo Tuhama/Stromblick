@@ -1,6 +1,6 @@
 import { lazy, Suspense, useId, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import type { Point } from "@stromblick/shared";
+import { DAY_AHEAD_PRICE_KEY, type Point } from "@stromblick/shared";
 import { useReadings } from "../../api/queries";
 import { currentLanguage } from "../../i18n";
 import { berlinZoneName, formatClock, todayInBerlin } from "../../time/berlin";
@@ -17,7 +17,7 @@ export function PriceToday() {
   const unitId = useId();
   const { unit, setUnit } = usePriceUnit();
   const today = todayInBerlin();
-  const readings = useReadings("price-day-ahead", { from: today, to: today });
+  const readings = useReadings(DAY_AHEAD_PRICE_KEY, { from: today, to: today });
 
   // Converted once, so the chart, the figures and the text alternative all show the same numbers.
   const apiPoints = readings.data?.points;

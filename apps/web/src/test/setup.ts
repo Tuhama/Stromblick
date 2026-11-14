@@ -3,8 +3,13 @@ import { cleanup } from "@testing-library/react";
 import i18n from "i18next";
 import { createElement } from "react";
 import { afterEach, beforeEach, vi } from "vitest";
-import type { ReadingsResponse, StatusResponse } from "@stromblick/shared";
+import {
+  DAY_AHEAD_PRICE_KEY,
+  type ReadingsResponse,
+  type StatusResponse,
+} from "@stromblick/shared";
 import { initI18n } from "../i18n";
+import { MINUTE } from "../time/units";
 import { mockSystemTheme } from "./media";
 
 initI18n();
@@ -19,13 +24,13 @@ beforeEach(async () => {
   await i18n.changeLanguage("en");
   mockSystemTheme("light");
   // Pages call the API; tests get one with fresh data unless they stub fetch themselves.
-  const updated = new Date(Date.now() - 20 * 60_000).toISOString();
+  const updated = new Date(Date.now() - 20 * MINUTE).toISOString();
   const status: StatusResponse = {
     lastSuccessAt: updated,
     lastRun: { status: "SUCCEEDED", finishedAt: updated },
   };
   const readings: ReadingsResponse = {
-    series: "price-day-ahead",
+    series: DAY_AHEAD_PRICE_KEY,
     region: "DE-LU",
     resolution: "quarterhour",
     unit: "EUR/MWh",

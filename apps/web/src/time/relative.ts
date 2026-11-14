@@ -1,6 +1,4 @@
-const MINUTE = 60_000;
-const HOUR = 60 * MINUTE;
-const DAY = 24 * HOUR;
+import { DAY, HOUR, MINUTE } from "./units";
 
 /**
  * How long ago a moment was, in the reader's language: "20 minutes ago", "vor 2 Stunden".
