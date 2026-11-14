@@ -9,7 +9,7 @@ describe("routes", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Overview" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Overview" })).toHaveAttribute("aria-current", "page");
-    expect(await screen.findByText("API status: ok")).toBeInTheDocument();
+    expect(await screen.findByText(/^Data as of Nov 10, 2026, 8:00/)).toBeInTheDocument();
   });
 
   it.each([

@@ -25,7 +25,9 @@
   "overview": {
     "title": "Überblick",
     "intro": "Der heutige Strommix, die Preise und der Anteil erneuerbarer Energien.",
-    "apiStatus": "API-Status: {{status}}",
+    "loading": "Wird geladen …",
+    "dataAsOf": "Datenstand: {{time}}",
+    "noData": "Es wurden noch keine Daten geladen.",
     "apiError": "Die API ist gerade nicht erreichbar."
   },
   "tomorrow": {

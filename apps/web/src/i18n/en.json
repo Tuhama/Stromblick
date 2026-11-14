@@ -25,7 +25,9 @@
   "overview": {
     "title": "Overview",
     "intro": "Today's generation mix, prices and renewable share.",
-    "apiStatus": "API status: {{status}}",
+    "loading": "Loading…",
+    "dataAsOf": "Data as of {{time}}",
+    "noData": "No data has been loaded yet.",
     "apiError": "The API is not reachable right now."
   },
   "tomorrow": {
