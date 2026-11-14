@@ -9,6 +9,7 @@ import { createLogger } from "./logger";
 import { loadReadings } from "./series/load-readings";
 import { createSmardClient } from "./smard/client";
 import { loadStatus } from "./status/load-status";
+import { MINUTE } from "./time-units";
 
 // Local development reads apps/api/.env; in production the platform sets real env vars.
 if (existsSync(".env")) process.loadEnvFile(".env");
@@ -37,7 +38,7 @@ const stopIngestTimer =
   env.INGEST_INTERVAL_MINUTES === undefined
     ? undefined
     : startIngestTimer({
-        intervalMs: env.INGEST_INTERVAL_MINUTES * 60_000,
+        intervalMs: env.INGEST_INTERVAL_MINUTES * MINUTE,
         initialDelayMs: 15_000,
         runIfIdle: () => {
           const started = ingest.runIfIdle();

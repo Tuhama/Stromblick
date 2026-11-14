@@ -4,3 +4,4 @@ export * from "./series";
 export * from "./readings";
 export * from "./ingest";
 export * from "./status";
+export * from "./market";
