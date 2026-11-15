@@ -63,5 +63,11 @@
   "error": {
     "title": "Etwas ist schiefgelaufen",
     "text": "Die Seite konnte nicht angezeigt werden. Bitte lade sie neu."
+  },
+  "chart": {
+    "loading": "Diagramm wird geladen…",
+    "empty": "Keine Daten vorhanden.",
+    "error": "Das Diagramm konnte nicht geladen werden.",
+    "retry": "Erneut versuchen"
   }
 }
