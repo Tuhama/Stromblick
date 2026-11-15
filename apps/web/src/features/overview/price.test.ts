@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Point } from "@stromblick/shared";
-import { axisTicks, formatPrice, priceOption, summarizePrices } from "./price";
+import { MAX_CHART_POINTS } from "../../charts/downsample";
+import { formatPrice, priceOption, summarizePrices } from "./price";
 
 const POINTS: Point[] = [
   [Date.parse("2026-11-13T23:00:00Z"), 80],
@@ -31,18 +32,14 @@ describe("formatPrice", () => {
   });
 });
 
-describe("axisTicks", () => {
-  it("picks every fourth full hour on the Berlin clock", () => {
-    // 13 November, 23:00 UTC is midnight in Berlin; one point every 15 minutes for a day.
-    const start = Date.parse("2026-11-13T23:00:00Z");
-    const day: Point[] = Array.from({ length: 96 }, (_, i) => [start + i * 900_000, 50]);
-
-    expect(axisTicks(day)).toEqual([0, 4, 8, 12, 16, 20].map((hour) => start + hour * 3_600_000));
-  });
-});
-
 describe("priceOption", () => {
-  const colors = { line: "#0b1f2a", text: "#4a5d69", grid: "#d5dee3", background: "#ffffff" };
+  const colors = {
+    line: "#0b1f2a",
+    text: "#4a5d69",
+    grid: "#d5dee3",
+    background: "#ffffff",
+    series: ["#2a78d6"],
+  };
   const option = priceOption({
     points: POINTS,
     unit: "EUR/MWh",
@@ -63,6 +60,21 @@ describe("priceOption", () => {
       expect.objectContaining({ lineStyle: { color: "#0b1f2a", width: 2 } }),
     ]);
     expect(option.tooltip).toMatchObject({ backgroundColor: "#ffffff" });
+  });
+
+  it("draws a year of 15-minute prices as a bounded number of averaged points", () => {
+    const start = Date.parse("2025-12-31T23:00:00Z");
+    const year: Point[] = Array.from({ length: 35_040 }, (_, i) => [start + i * 900_000, 50]);
+    const long = priceOption({
+      points: year,
+      unit: "EUR/MWh",
+      language: "en",
+      colors,
+      animate: true,
+    });
+    const [line] = long.series as { data: unknown[] }[];
+    expect(line?.data.length).toBeLessThanOrEqual(MAX_CHART_POINTS);
+    expect(long.animation).toBe(false);
   });
 
   it("animates only when asked to", () => {

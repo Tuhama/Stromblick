@@ -2,9 +2,10 @@ import { lazy, Suspense, useId, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { DAY_AHEAD_PRICE_KEY, type Point } from "@stromblick/shared";
 import { useReadings } from "../../api/queries";
+import { ChartPanel, type ChartStatus } from "../../charts/ChartPanel";
 import { currentLanguage } from "../../i18n";
 import { berlinZoneName, formatClock, todayInBerlin } from "../../time/berlin";
-import { formatPrice, summarizePrices } from "./price";
+import { formatPrice, summarizePrices, type PriceSummary } from "./price";
 import { convertPrice, PRICE_UNITS, usePriceUnit } from "./price-unit";
 
 // Its own chunk: ECharts is downloaded after the page is on screen, not before.
@@ -25,6 +26,13 @@ export function PriceToday() {
     () => apiPoints?.map(([time, price]): Point => [time, convertPrice(price, unit)]),
     [apiPoints, unit],
   );
+
+  const language = currentLanguage();
+  const summary = points && summarizePrices(points);
+  let status: ChartStatus = "ready";
+  if (readings.isPending) status = "loading";
+  else if (readings.isError) status = "error";
+  else if (!summary) status = "empty";
 
   return (
     <section aria-labelledby={titleId}>
@@ -52,56 +60,60 @@ export function PriceToday() {
           </select>
         </div>
       </div>
-      <div className="mt-3">{content()}</div>
+      <div className="mt-3">
+        <ChartPanel
+          status={status}
+          messages={{
+            loading: t("overview.loading"),
+            error: t("overview.price.error"),
+            empty: t("overview.price.empty"),
+          }}
+          onRetry={() => void readings.refetch()}
+        >
+          {summary && (
+            <>
+              <Suspense fallback={<div className="h-72" />}>
+                <PriceChart points={points} unit={unit} label={chartLabel(summary)} />
+              </Suspense>
+              <dl className="mt-4 grid grid-cols-3 gap-4">
+                {figures(summary).map((figure) => (
+                  <div key={figure.label}>
+                    <dt className="text-sm text-muted-foreground">{figure.label}</dt>
+                    <dd className="font-semibold tabular-nums">
+                      {formatPrice(figure.value, language)}{" "}
+                      <span className="text-sm font-normal text-muted-foreground">{unit}</span>
+                    </dd>
+                    {figure.time !== null && (
+                      <dd className="text-sm text-muted-foreground">
+                        {t("overview.price.at", { time: formatClock(figure.time) })}
+                      </dd>
+                    )}
+                  </div>
+                ))}
+              </dl>
+              <p className="mt-4 text-sm text-muted-foreground">
+                {t("overview.price.note", { zone: berlinZoneName(summary.min[0], language) })}
+              </p>
+            </>
+          )}
+        </ChartPanel>
+      </div>
     </section>
   );
 
-  function content() {
-    if (readings.isPending) return <Note>{t("overview.loading")}</Note>;
-    if (readings.isError) return <Note>{t("overview.price.error")}</Note>;
-
-    const summary = points && summarizePrices(points);
-    if (!summary) return <Note>{t("overview.price.empty")}</Note>;
-
-    const language = currentLanguage();
-    const figures = [
-      { label: t("overview.price.low"), value: summary.min[1], time: summary.min[0] },
-      { label: t("overview.price.high"), value: summary.max[1], time: summary.max[0] },
-      { label: t("overview.price.average"), value: summary.average, time: null },
+  function figures(prices: PriceSummary) {
+    return [
+      { label: t("overview.price.low"), value: prices.min[1], time: prices.min[0] },
+      { label: t("overview.price.high"), value: prices.max[1], time: prices.max[0] },
+      { label: t("overview.price.average"), value: prices.average, time: null },
     ];
-    const chartLabel = t("overview.price.chartLabel", {
-      unit,
-      low: formatPrice(summary.min[1], language),
-      high: formatPrice(summary.max[1], language),
-    });
-
-    return (
-      <>
-        <Suspense fallback={<div className="h-72" />}>
-          <PriceChart points={points} unit={unit} label={chartLabel} />
-        </Suspense>
-        <dl className="mt-4 grid grid-cols-3 gap-4">
-          {figures.map((figure) => (
-            <div key={figure.label}>
-              <dt className="text-sm text-muted-foreground">{figure.label}</dt>
-              <dd className="font-semibold tabular-nums">
-                {formatPrice(figure.value, language)}{" "}
-                <span className="text-sm font-normal text-muted-foreground">{unit}</span>
-              </dd>
-              {figure.time !== null && (
-                <dd className="text-sm text-muted-foreground">
-                  {t("overview.price.at", { time: formatClock(figure.time) })}
-                </dd>
-              )}
-            </div>
-          ))}
-        </dl>
-        <Note>{t("overview.price.note", { zone: berlinZoneName(summary.min[0], language) })}</Note>
-      </>
-    );
   }
-}
 
-function Note({ children }: { children: string }) {
-  return <p className="mt-4 text-sm text-muted-foreground first:mt-0">{children}</p>;
+  function chartLabel(prices: PriceSummary) {
+    return t("overview.price.chartLabel", {
+      unit,
+      low: formatPrice(prices.min[1], language),
+      high: formatPrice(prices.max[1], language),
+    });
+  }
 }

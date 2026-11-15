@@ -63,5 +63,25 @@
   "error": {
     "title": "Etwas ist schiefgelaufen",
     "text": "Die Seite konnte nicht angezeigt werden. Bitte lade sie neu."
+  },
+  "chart": {
+    "loading": "Diagramm wird geladen…",
+    "empty": "Keine Daten vorhanden.",
+    "error": "Das Diagramm konnte nicht geladen werden.",
+    "retry": "Erneut versuchen"
+  },
+  "generation": {
+    "title": "Strommix",
+    "chartLabel": "Gestapeltes Flächendiagramm der Stromerzeugung nach Quelle, in {{unit}}.",
+    "groups": {
+      "solar": "Photovoltaik",
+      "wind": "Wind",
+      "biomass": "Biomasse",
+      "hydro": "Wasserkraft",
+      "gas": "Erdgas",
+      "hardCoal": "Steinkohle",
+      "lignite": "Braunkohle",
+      "other": "Sonstige"
+    }
   }
 }

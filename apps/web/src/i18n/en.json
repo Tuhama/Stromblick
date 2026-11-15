@@ -63,5 +63,25 @@
   "error": {
     "title": "Something went wrong",
     "text": "The page could not be shown. Try reloading it."
+  },
+  "chart": {
+    "loading": "Loading the chart…",
+    "empty": "There is no data to show.",
+    "error": "The chart couldn't be loaded.",
+    "retry": "Try again"
+  },
+  "generation": {
+    "title": "Generation mix",
+    "chartLabel": "Stacked area chart of electricity generation by source, in {{unit}}.",
+    "groups": {
+      "solar": "Solar",
+      "wind": "Wind",
+      "biomass": "Biomass",
+      "hydro": "Hydropower",
+      "gas": "Natural gas",
+      "hardCoal": "Hard coal",
+      "lignite": "Lignite",
+      "other": "Other"
+    }
   }
 }

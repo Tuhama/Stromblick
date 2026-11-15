@@ -9,3 +9,5 @@
 - Colors only through the design tokens in src/index.css (bg-background, text-muted-foreground, …); no hex values or dark: variants in components.
 - Yellow (accent) is a fill with accent-foreground text on it, never text on a light background (fails contrast).
 - Page headings and browser tab titles through the Page component in src/layout.
+- Charts: a pure option function (tested), an `EChart` wrapper, states through `ChartPanel`, one story per state in `*.stories.tsx`. Run Storybook with `pnpm --filter @stromblick/web storybook`.
+- Chart colors come from the `--series-n` tokens; keep a group on the same slot everywhere. At most 8 series; fold the rest into "Other".
