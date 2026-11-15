@@ -8,7 +8,13 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import prettier from "eslint-config-prettier";
 
 export default defineConfig([
-  globalIgnores(["**/dist/**", "**/.turbo/**", "**/coverage/**", "**/generated/**"]),
+  globalIgnores([
+    "**/dist/**",
+    "**/.turbo/**",
+    "**/coverage/**",
+    "**/generated/**",
+    "**/storybook-static/**",
+  ]),
   // All packages: strict, type-aware TypeScript rules
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
@@ -42,7 +48,11 @@ export default defineConfig([
       jsxA11y.flatConfigs.recommended,
     ],
   },
-
+  // Stories export a `meta` and one object per story, not components
+  {
+    files: ["apps/web/**/*.stories.tsx", "apps/web/.storybook/**"],
+    rules: { "react-refresh/only-export-components": "off" },
+  },
   // Plain JS config files are in no tsconfig, so lint them without type info
   {
     files: ["**/*.{js,mjs,cjs}"],

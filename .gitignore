@@ -155,3 +155,5 @@ vite.config.ts.timestamp-*
 CLAUDE.local.md
 
 apps/api/src/generated/
+# Storybook
+storybook-static
