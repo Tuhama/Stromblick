@@ -17,7 +17,9 @@ export function EChart({ option, label, className }: EChartProps) {
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    const chart = echarts.init(container);
+    // useDirtyRect: only the part of the canvas that changed is repainted. Without it, every mouse
+    // move over a year of stacked layers repaints all of them: about 240 ms each, measured.
+    const chart = echarts.init(container, null, { useDirtyRect: true });
     chartRef.current = chart;
     // ECharts draws at a fixed pixel size, so it has to be told when its container changes.
     const observer = new ResizeObserver(() => {

@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 
+export const SERIES_COUNT = 8;
+
 export interface ChartColors {
   line: string;
   text: string;
   grid: string;
   background: string;
+  /** Categorical colors for charts with several series, in their fixed order. */
+  series: readonly string[];
 }
 
 /** A canvas can't use CSS variables, so the design tokens are read from <html> as plain colors. */
@@ -16,6 +20,7 @@ function readChartColors(): ChartColors {
     text: token("--muted-foreground"),
     grid: token("--border"),
     background: token("--background"),
+    series: Array.from({ length: SERIES_COUNT }, (_, i) => token(`--series-${String(i + 1)}`)),
   };
 }
 

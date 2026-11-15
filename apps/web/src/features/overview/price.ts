@@ -1,7 +1,11 @@
 import type { Point } from "@stromblick/shared";
 import type { ChartColors } from "../../charts/chart-colors";
 import type { ChartOption } from "../../charts/echarts";
-import { formatClock } from "../../time/berlin";
+import { downsample, MAX_CHART_POINTS } from "../../charts/downsample";
+import { timeAxis } from "../../charts/time-axis";
+import { readPoint } from "../../charts/tooltip";
+import { formatClock, formatDateTime } from "../../time/berlin";
+import { DAY } from "../../time/units";
 
 export interface PriceSummary {
   min: Point;
@@ -41,19 +45,6 @@ interface PriceOptionInput {
   animate: boolean;
 }
 
-/**
- * The full hours to label: every fourth one on the Berlin clock (00:00, 04:00, …).
- * ECharts would pick its own ticks by the browser's clock, which is uneven for readers elsewhere.
- */
-export function axisTicks(points: readonly Point[]): number[] {
-  return points
-    .map(([time]) => time)
-    .filter((time) => {
-      const [hour, minute] = formatClock(time).split(":");
-      return minute === "00" && Number(hour) % 4 === 0;
-    });
-}
-
 /** The ECharts option of the price line. A pure function, so it is tested without a canvas. */
 export function priceOption({
   points,
@@ -62,9 +53,15 @@ export function priceOption({
   colors,
   animate,
 }: PriceOptionInput): ChartOption {
-  const ticks = axisTicks(points);
+  // Normally the API already sends few enough points; this keeps a long range from freezing the page.
+  const [drawn = []] = downsample([points]);
+  const times = drawn.map(([time]) => time);
+  // A day or less shows the clock time, longer ranges the date as well.
+  const first = times[0] ?? 0;
+  const spansDays = (times.at(-1) ?? first) - first > DAY;
   return {
-    animation: animate,
+    // Animating tens of thousands of points would stall the first draw.
+    animation: animate && points.length <= MAX_CHART_POINTS,
     grid: { left: 8, right: 16, top: 16, bottom: 8, containLabel: true },
     tooltip: {
       trigger: "axis",
@@ -73,24 +70,14 @@ export function priceOption({
       textStyle: { color: colors.text },
       formatter: (params) => {
         const hovered = Array.isArray(params) ? params[0] : params;
-        const value: unknown = hovered?.value;
-        if (!Array.isArray(value)) return "";
-        const pair: unknown[] = value;
-        const [time, price] = pair;
-        if (typeof time !== "number" || typeof price !== "number") return "";
-        return `${formatClock(time)}<br /><strong>${formatPrice(price, language)}</strong> ${unit}`;
+        const point = readPoint(hovered?.value);
+        if (!point) return "";
+        const [time, price] = point;
+        const when = spansDays ? formatDateTime(time, language) : formatClock(time);
+        return `${when}<br /><strong>${formatPrice(price, language)}</strong> ${unit}`;
       },
     },
-    xAxis: {
-      type: "time",
-      axisLine: { lineStyle: { color: colors.grid } },
-      axisTick: { customValues: ticks },
-      axisLabel: {
-        color: colors.text,
-        customValues: ticks,
-        formatter: (value: number) => formatClock(value),
-      },
-    },
+    xAxis: timeAxis({ times, language, colors }),
     yAxis: {
       type: "value",
       axisLabel: { color: colors.text },
@@ -104,7 +91,7 @@ export function priceOption({
         showSymbol: false,
         lineStyle: { color: colors.line, width: 2 },
         itemStyle: { color: colors.line },
-        data: points.map(([time, price]) => [time, price]),
+        data: drawn.map(([time, price]) => [time, price]),
       },
     ],
   };
