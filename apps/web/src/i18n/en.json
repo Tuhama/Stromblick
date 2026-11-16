@@ -79,7 +79,12 @@
     "loading": "Loading the chart…",
     "empty": "There is no data to show.",
     "error": "The chart couldn't be loaded.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "table": {
+      "show": "Show the data as a table",
+      "time": "Time",
+      "missing": "no data"
+    }
   },
   "generation": {
     "title": "Generation mix today",

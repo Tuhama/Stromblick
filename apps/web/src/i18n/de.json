@@ -79,7 +79,12 @@
     "loading": "Diagramm wird geladen…",
     "empty": "Keine Daten vorhanden.",
     "error": "Das Diagramm konnte nicht geladen werden.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "table": {
+      "show": "Daten als Tabelle anzeigen",
+      "time": "Uhrzeit",
+      "missing": "keine Daten"
+    }
   },
   "generation": {
     "title": "Strommix heute",
