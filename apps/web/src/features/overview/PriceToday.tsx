@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { DAY_AHEAD_PRICE_KEY, type Point } from "@stromblick/shared";
 import { useReadings } from "../../api/queries";
 import { ChartPanel, type ChartStatus } from "../../charts/ChartPanel";
+import { DataTable } from "../../charts/DataTable";
 import { currentLanguage } from "../../i18n";
 import { berlinZoneName, formatClock, todayInBerlin } from "../../time/berlin";
 import { formatPrice, summarizePrices, type PriceSummary } from "./price";
@@ -94,6 +95,14 @@ export function PriceToday() {
               <p className="mt-4 text-sm text-muted-foreground">
                 {t("overview.price.note", { zone: berlinZoneName(summary.min[0], language) })}
               </p>
+              <DataTable
+                caption={t("overview.price.tableCaption", {
+                  zone: berlinZoneName(summary.min[0], language),
+                })}
+                columns={[t("overview.price.column", { unit })]}
+                rows={points.map(([time, price]) => ({ time, values: [price] }))}
+                formatValue={(value) => formatPrice(value, language)}
+              />
             </>
           )}
         </ChartPanel>

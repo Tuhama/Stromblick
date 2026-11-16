@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { RenewableShare } from "./RenewableShare";
 import { GenerationToday } from "./GenerationToday";
@@ -52,6 +52,30 @@ describe("GenerationToday", () => {
     const chart = await screen.findByRole("img", { name: "generation chart" });
     expect(chart.dataset["layers"]).toContain("solar");
     expect(chart.dataset["layers"]).toContain("gas");
+  });
+
+  it("offers the hours as a table with a column per source and a total", async () => {
+    renderWithClient(<GenerationToday />);
+    const table = await screen.findByRole("table", {
+      name: "Electricity generation today by source, in MWh per hour, in German time (CET)",
+    });
+
+    const headers = within(table)
+      .getAllByRole("columnheader")
+      .map((header) => header.textContent);
+    expect(headers[0]).toBe("Time");
+    expect(headers).toHaveLength(10); // time, 8 groups, total
+    expect(headers.at(-1)).toBe("Total");
+    expect(
+      within(table)
+        .getAllByRole("rowheader")
+        .map((header) => header.textContent),
+    ).toEqual(["10:00", "11:00"]);
+    // The default stub gives each of the 11 series 100 MWh an hour.
+    const [firstRow] = within(table).getAllByRole("row").slice(1);
+    expect(firstRow).toBeDefined();
+    if (!firstRow) return;
+    expect(within(firstRow).getAllByRole("cell").at(-1)).toHaveTextContent("1,100");
   });
 
   it("offers a retry when the readings can't be loaded", async () => {

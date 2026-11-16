@@ -40,12 +40,16 @@
       "high": "Highest",
       "average": "Average",
       "at": "at {{time}}",
-      "chartLabel": "Line chart of today's day-ahead price in {{unit}}. Lowest {{low}}, highest {{high}}."
+      "chartLabel": "Line chart of today's day-ahead price in {{unit}}. Lowest {{low}}, highest {{high}}.",
+      "tableCaption": "Day-ahead price today by time, in German time ({{zone}})",
+      "column": "Price ({{unit}})"
     },
     "generation": {
       "error": "The generation figures couldn't be loaded.",
       "empty": "Today's generation figures aren't available yet.",
-      "note": "Energy per hour in MWh, for complete hours only. Times are in German time ({{zone}})."
+      "note": "Energy per hour in MWh, for complete hours only. Times are in German time ({{zone}}).",
+      "tableCaption": "Electricity generation today by source, in MWh per hour, in German time ({{zone}})",
+      "total": "Total"
     },
     "renewable": {
       "title": "Renewable share today",
