@@ -18,5 +18,8 @@ export default defineConfig({
     // A browser-like DOM for component tests.
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
+    // Tests that render the whole app and click through it take 3 to 5 s on a busy machine in jsdom:
+    // the default 5 s limit made them fail at random.
+    testTimeout: 15_000,
   },
 });
