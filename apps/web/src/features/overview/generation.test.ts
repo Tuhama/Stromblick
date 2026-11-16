@@ -2,7 +2,14 @@ import { describe, expect, it } from "vitest";
 import type { Point } from "@stromblick/shared";
 import { SAMPLE_START, sampleGeneration } from "../../charts/sample-data";
 import { MAX_CHART_POINTS } from "../../charts/downsample";
-import { GENERATION_GROUPS, generationOption, groupGeneration } from "./generation";
+import {
+  GENERATION_GROUPS,
+  generationOption,
+  groupGeneration,
+  formatShare,
+  keepCommonTimes,
+  renewableShare,
+} from "./generation";
 
 const colors = {
   line: "#0b1f2a",
@@ -108,5 +115,77 @@ describe("generationOption", () => {
   it("keeps a day's points as they are", () => {
     const [first] = build(1, 60).series as { data: unknown[] }[];
     expect(first?.data).toHaveLength(24);
+  });
+});
+describe("renewableShare", () => {
+  const at = SAMPLE_START;
+  it("divides renewable generation by all generation", () => {
+    const share = renewableShare([
+      { key: "generation-solar", points: [[at, 30]] },
+      { key: "generation-wind-onshore", points: [[at, 20]] },
+      { key: "generation-lignite", points: [[at, 50]] },
+    ]);
+    expect(share).toBeCloseTo(0.5);
+  });
+
+  it("doesn't count pumped storage as renewable", () => {
+    const share = renewableShare([
+      { key: "generation-pumped-storage", points: [[at, 10]] },
+      { key: "generation-solar", points: [[at, 10]] },
+    ]);
+    expect(share).toBeCloseTo(0.5);
+  });
+
+  it("ignores series that aren't generation, such as the load", () => {
+    const share = renewableShare([
+      { key: "load", points: [[at, 1000]] },
+      { key: "generation-solar", points: [[at, 10]] },
+    ]);
+    expect(share).toBe(1);
+  });
+
+  it("is null without any generation", () => {
+    expect(renewableShare([])).toBeNull();
+    expect(renewableShare([{ key: "generation-solar", points: [] }])).toBeNull();
+  });
+});
+
+describe("keepCommonTimes", () => {
+  it("drops hours that some of the series don't have yet", () => {
+    const hour = 3_600_000;
+    const result = keepCommonTimes([
+      {
+        key: "generation-solar",
+        points: [
+          [0, 1],
+          [hour, 2],
+          [2 * hour, 3],
+        ],
+      },
+      {
+        key: "generation-lignite",
+        points: [
+          [0, 1],
+          [hour, 2],
+        ],
+      },
+      { key: "generation-gas", points: [] },
+    ]);
+    expect(result[0]?.points).toEqual([
+      [0, 1],
+      [hour, 2],
+    ]);
+    expect(result[1]?.points).toEqual([
+      [0, 1],
+      [hour, 2],
+    ]);
+    expect(result[2]?.points).toEqual([]);
+  });
+});
+
+describe("formatShare", () => {
+  it("writes a whole percentage in the reader's language", () => {
+    expect(formatShare(0.624, "en")).toBe("62%");
+    expect(formatShare(0.624, "de").replace(/\s/g, " ")).toBe("62 %");
   });
 });
