@@ -41,6 +41,17 @@
       "average": "Durchschnitt",
       "at": "um {{time}}",
       "chartLabel": "Liniendiagramm des heutigen Day-Ahead-Preises in {{unit}}. Niedrigster Preis {{low}}, höchster {{high}}."
+    },
+    "generation": {
+      "error": "Die Erzeugungsdaten konnten nicht geladen werden.",
+      "empty": "Die Erzeugungsdaten für heute liegen noch nicht vor.",
+      "note": "Energie pro Stunde in MWh, nur vollständige Stunden. Die Zeiten sind in deutscher Zeit ({{zone}})."
+    },
+    "renewable": {
+      "title": "Erneuerbarer Anteil heute",
+      "note": "Solar, Wind, Biomasse, Wasserkraft und sonstige Erneuerbare als Anteil an der gesamten bisher heute in Deutschland erzeugten Strommenge. Pumpspeicher zählen nicht als erneuerbar.",
+      "error": "Der Anteil konnte nicht berechnet werden.",
+      "empty": "Heute noch nicht verfügbar."
     }
   },
   "tomorrow": {
@@ -71,7 +82,7 @@
     "retry": "Erneut versuchen"
   },
   "generation": {
-    "title": "Strommix",
+    "title": "Strommix heute",
     "chartLabel": "Gestapeltes Flächendiagramm der Stromerzeugung nach Quelle, in {{unit}}.",
     "groups": {
       "solar": "Photovoltaik",

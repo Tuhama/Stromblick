@@ -20,6 +20,15 @@ vi.mock("../features/overview/PriceChart", () => ({
     createElement("div", { role: "img", "aria-label": label }),
 }));
 
+vi.mock("../features/overview/GenerationChart", () => ({
+  default: ({ layers }: { layers: { id: string }[] }) =>
+    createElement("div", {
+      role: "img",
+      "aria-label": "generation chart",
+      "data-layers": layers.map((layer) => layer.id).join(","),
+    }),
+}));
+
 beforeEach(async () => {
   await i18n.changeLanguage("en");
   mockSystemTheme("light");
@@ -40,7 +49,24 @@ beforeEach(async () => {
     "fetch",
     vi.fn<typeof fetch>((input) => {
       const url = input instanceof Request ? input.url : input.toString();
-      return Promise.resolve(Response.json(url.includes("/readings") ? readings : status));
+      if (!url.includes("/readings")) return Promise.resolve(Response.json(status));
+      // Generation series: 100 MWh in each of two hours; the price series: one quarter hour.
+      const key = /\/series\/([^/]+)\/readings/.exec(url)?.[1] ?? DAY_AHEAD_PRICE_KEY;
+      if (key.startsWith("generation-")) {
+        const generation: ReadingsResponse = {
+          ...readings,
+          series: key,
+          region: "DE",
+          resolution: "hour",
+          unit: "MWh",
+          points: [
+            [Date.parse("2026-11-10T09:00:00Z"), 100],
+            [Date.parse("2026-11-10T10:00:00Z"), 100],
+          ],
+        };
+        return Promise.resolve(Response.json(generation));
+      }
+      return Promise.resolve(Response.json(readings));
     }),
   );
 });

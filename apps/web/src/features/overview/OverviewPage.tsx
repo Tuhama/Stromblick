@@ -6,7 +6,9 @@ import { berlinZoneName, formatDateTime } from "../../time/berlin";
 import { formatTimeAgo } from "../../time/relative";
 import { MINUTE } from "../../time/units";
 import { useNow } from "../../time/use-now";
+import { GenerationToday } from "./GenerationToday";
 import { PriceToday } from "./PriceToday";
+import { RenewableShare } from "./RenewableShare";
 
 export function OverviewPage() {
   const { t } = useTranslation();
@@ -32,7 +34,10 @@ export function OverviewPage() {
       <p className="text-sm text-muted-foreground" title={exactTime}>
         {statusLine}
       </p>
-      <div className="mt-8">
+
+      <div className="mt-8 space-y-10">
+        <RenewableShare />
+        <GenerationToday />
         <PriceToday />
       </div>
     </Page>
