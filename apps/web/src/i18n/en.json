@@ -41,6 +41,17 @@
       "average": "Average",
       "at": "at {{time}}",
       "chartLabel": "Line chart of today's day-ahead price in {{unit}}. Lowest {{low}}, highest {{high}}."
+    },
+    "generation": {
+      "error": "The generation figures couldn't be loaded.",
+      "empty": "Today's generation figures aren't available yet.",
+      "note": "Energy per hour in MWh, for complete hours only. Times are in German time ({{zone}})."
+    },
+    "renewable": {
+      "title": "Renewable share today",
+      "note": "Solar, wind, biomass, hydropower and other renewables as a share of all electricity generated in Germany so far today. Pumped storage doesn't count as renewable.",
+      "error": "The share couldn't be calculated.",
+      "empty": "Not available yet today."
     }
   },
   "tomorrow": {
@@ -71,7 +82,7 @@
     "retry": "Try again"
   },
   "generation": {
-    "title": "Generation mix",
+    "title": "Generation mix today",
     "chartLabel": "Stacked area chart of electricity generation by source, in {{unit}}.",
     "groups": {
       "solar": "Solar",

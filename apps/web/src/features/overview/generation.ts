@@ -152,3 +152,56 @@ export function generationOption({
     }),
   };
 }
+/** Every series key the generation chart folds in: the keys of all groups. */
+export const GENERATION_KEYS: readonly string[] = GENERATION_GROUPS.flatMap((group) => group.keys);
+
+/** What counts as renewable. Pumped storage doesn't (it returns energy taken from the grid). */
+const RENEWABLE_KEYS: readonly string[] = [
+  "generation-solar",
+  "generation-wind-onshore",
+  "generation-wind-offshore",
+  "generation-biomass",
+  "generation-hydro",
+  "generation-other-renewables",
+];
+
+/**
+ * Keeps only the hours for which every series that has any data has a value. SMARD publishes the
+ * sources with different delays, so the newest hour is often partial; a stack or a share that
+ * included it would look as if generation had dropped.
+ */
+export function keepCommonTimes(series: readonly GenerationSeries[]): GenerationSeries[] {
+  const filled = series.filter((entry) => entry.points.length > 0);
+  const [first, ...others] = filled;
+  if (!first) return series.map((entry) => ({ ...entry }));
+
+  const common = new Set(first.points.map(([time]) => time));
+  for (const entry of others) {
+    const times = new Set(entry.points.map(([time]) => time));
+    for (const time of common) if (!times.has(time)) common.delete(time);
+  }
+  return series.map((entry) => ({
+    key: entry.key,
+    points: entry.points.filter(([time]) => common.has(time)),
+  }));
+}
+
+/** Renewable generation as a share of all generation, from 0 to 1, or null without any generation. */
+export function renewableShare(series: readonly GenerationSeries[]): number | null {
+  let renewable = 0;
+  let total = 0;
+  for (const entry of series) {
+    if (!GENERATION_KEYS.includes(entry.key)) continue;
+    const sum = entry.points.reduce((acc, [, value]) => acc + value, 0);
+    total += sum;
+    if (RENEWABLE_KEYS.includes(entry.key)) renewable += sum;
+  }
+  return total > 0 ? renewable / total : null;
+}
+
+/** A share as a whole percentage in the reader's language: "62%" or "62 %". */
+export function formatShare(share: number, language: string): string {
+  return new Intl.NumberFormat(language, { style: "percent", maximumFractionDigits: 0 }).format(
+    share,
+  );
+}
