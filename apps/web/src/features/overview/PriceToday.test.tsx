@@ -143,6 +143,29 @@ describe("PriceToday", () => {
     expect(highest).toHaveTextContent("um 18:00");
   });
 
+  it("shows no table while loading, when there are no prices, or when they can't be loaded", async () => {
+    // Loading: the request never answers.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>(() => new Promise<Response>(() => undefined)),
+    );
+    const loading = renderPriceToday();
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    loading.unmount();
+
+    stubFetch({ ...READINGS, points: [] });
+    const empty = renderPriceToday();
+    await screen.findByText("Today's prices aren't available yet.");
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    empty.unmount();
+
+    stubFetch({ type: "about:blank", title: "Internal Server Error", status: 500 }, 500);
+    renderPriceToday();
+    await screen.findByText("The prices couldn't be loaded.");
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+  });
+
   it("says so when today's prices aren't there yet", async () => {
     stubFetch({ ...READINGS, points: [] });
     renderPriceToday();
