@@ -44,3 +44,12 @@ pnpm + Turborepo monorepo:
   silently at startup when its stdin is an open pipe, which is how Turborepo runs tasks.
 - `prisma` is a production dependency of apps/api on purpose: the Docker image runs `prisma migrate deploy` before each release.
 - In production the API uses DATABASE_URL (sslmode=verify-full); the Prisma CLI uses MIGRATE_DATABASE_URL (sslmode=require).
+
+## How to work with the owner
+
+- Small steps: one issue = one branch (`gh issue develop <N> --checkout`) = one PR. Small Conventional Commits with the tests in the same commit.
+- Every PR title is a Conventional Commit and the body ends with `Closes #N` (squash merge).
+- Before finishing a step run: pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build
+- Check current versions and docs before recommending a library or an API. Say what you tested and what you could not test.
+- A significant decision gets an ADR in the same PR (docs/adr). Six are still owed: tsdown, Express 5, Prisma 7 pin, Neon URLs, Docker image with release migrations, Vercel rewrite. One per session.
+- Times are Europe/Berlin and labelled on the page. User-facing text exists in EN and DE.
