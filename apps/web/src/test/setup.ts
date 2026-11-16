@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { cleanup } from "@testing-library/react";
+import { cleanup, configure } from "@testing-library/react";
 import i18n from "i18next";
 import { createElement } from "react";
 import { afterEach, beforeEach, vi } from "vitest";
@@ -13,6 +13,10 @@ import { MINUTE } from "../time/units";
 import { mockSystemTheme } from "./media";
 
 initI18n();
+
+// The first test of a file waits for the lazily loaded chart chunk, which takes 1 to 3 s on a busy
+// machine: longer than the default 1 s for findBy queries, which made those tests fail at random.
+configure({ asyncUtilTimeout: 5000 });
 
 // jsdom has no canvas, so ECharts can't draw in tests. The stand-in keeps the chart's text alternative.
 vi.mock("../features/overview/PriceChart", () => ({

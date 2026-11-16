@@ -48,6 +48,18 @@ export default defineConfig([
       jsxA11y.flatConfigs.recommended,
     ],
   },
+  // axe's scrollable-region-focusable rule requires a scrollable region to be keyboard-focusable,
+  // which contradicts jsx-a11y's no-noninteractive-tabindex for role="region". So `region` joins the
+  // allowed roles. `tabpanel` stays: setting `roles` replaces the plugin's default list.
+  {
+    files: ["apps/web/**/*.{ts,tsx}"],
+    rules: {
+      "jsx-a11y/no-noninteractive-tabindex": [
+        "error",
+        { tags: [], roles: ["tabpanel", "region"], allowExpressionValues: true },
+      ],
+    },
+  },
   // Stories export a `meta` and one object per story, not components
   {
     files: ["apps/web/**/*.stories.tsx", "apps/web/.storybook/**"],

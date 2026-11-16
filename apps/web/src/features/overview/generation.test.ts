@@ -7,8 +7,10 @@ import {
   generationOption,
   groupGeneration,
   formatShare,
+  generationRows,
   keepCommonTimes,
   renewableShare,
+  type GenerationLayer,
 } from "./generation";
 
 const colors = {
@@ -187,5 +189,39 @@ describe("formatShare", () => {
   it("writes a whole percentage in the reader's language", () => {
     expect(formatShare(0.624, "en")).toBe("62%");
     expect(formatShare(0.624, "de").replace(/\s/g, " ")).toBe("62 %");
+  });
+});
+
+describe("generationRows", () => {
+  const hour = 3_600_000;
+  const layers: GenerationLayer[] = [
+    {
+      id: "solar",
+      slot: 0,
+      points: [
+        [0, 10],
+        [hour, 20],
+      ],
+    },
+    {
+      id: "wind",
+      slot: 1,
+      points: [
+        [hour, 5],
+        [2 * hour, 7],
+      ],
+    },
+  ];
+
+  it("has one row per hour, in time order, with each layer's value and the total last", () => {
+    expect(generationRows(layers)).toEqual([
+      { time: 0, values: [10, null, 10] },
+      { time: hour, values: [20, 5, 25] },
+      { time: 2 * hour, values: [null, 7, 7] },
+    ]);
+  });
+
+  it("gives no rows without layers", () => {
+    expect(generationRows([])).toEqual([]);
   });
 });

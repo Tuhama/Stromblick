@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import i18n from "i18next";
 import { describe, expect, it, vi } from "vitest";
@@ -67,6 +67,54 @@ describe("PriceToday", () => {
     expect(screen.getByText(/Times are in German time \(CET\)\./)).toBeInTheDocument();
   });
 
+  it("offers the day's prices as a table, in German time", async () => {
+    stubFetch(READINGS);
+    renderPriceToday();
+
+    const table = await screen.findByRole("table", {
+      name: "Day-ahead price today by time, in German time (CET)",
+    });
+    expect(
+      within(table)
+        .getAllByRole("columnheader")
+        .map((header) => header.textContent),
+    ).toEqual(["Time", "Price (EUR/MWh)"]);
+    expect(
+      within(table)
+        .getAllByRole("rowheader")
+        .map((header) => header.textContent),
+    ).toEqual(["00:00", "03:15", "18:00"]);
+    expect(
+      within(table)
+        .getAllByRole("cell")
+        .map((cell) => cell.textContent),
+    ).toEqual(["80.00", "-5.50", "120.30"]);
+  });
+
+  it("changes the table's unit with the chart's", async () => {
+    const user = userEvent.setup();
+    stubFetch(READINGS);
+    renderPriceToday();
+    await screen.findByRole("table");
+
+    await user.selectOptions(screen.getByLabelText("Price unit"), "ct/kWh");
+
+    const table = screen.getByRole("table");
+    expect(within(table).getByRole("columnheader", { name: "Price (ct/kWh)" })).toBeInTheDocument();
+    expect(within(table).getAllByRole("cell")[1]).toHaveTextContent("-0.55");
+  });
+
+  it("writes the table in German in German", async () => {
+    await i18n.changeLanguage("de");
+    stubFetch(READINGS);
+    renderPriceToday();
+
+    const table = await screen.findByRole("table", {
+      name: "Day-Ahead-Preis heute nach Uhrzeit, in deutscher Zeit (MEZ)",
+    });
+    expect(within(table).getAllByRole("cell")[2]).toHaveTextContent("120,30");
+  });
+
   it("shows the prices in ct/kWh when that unit is chosen, and remembers it", async () => {
     const user = userEvent.setup();
     stubFetch(READINGS);
@@ -93,6 +141,29 @@ describe("PriceToday", () => {
     const highest = (await screen.findByText("Höchster")).parentElement;
     expect(highest).toHaveTextContent("120,30 EUR/MWh");
     expect(highest).toHaveTextContent("um 18:00");
+  });
+
+  it("shows no table while loading, when there are no prices, or when they can't be loaded", async () => {
+    // Loading: the request never answers.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>(() => new Promise<Response>(() => undefined)),
+    );
+    const loading = renderPriceToday();
+    expect(await screen.findByRole("status")).toBeInTheDocument();
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    loading.unmount();
+
+    stubFetch({ ...READINGS, points: [] });
+    const empty = renderPriceToday();
+    await screen.findByText("Today's prices aren't available yet.");
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    empty.unmount();
+
+    stubFetch({ type: "about:blank", title: "Internal Server Error", status: 500 }, 500);
+    renderPriceToday();
+    await screen.findByText("The prices couldn't be loaded.");
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
 
   it("says so when today's prices aren't there yet", async () => {

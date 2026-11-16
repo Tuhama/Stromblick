@@ -40,12 +40,16 @@
       "high": "Höchster",
       "average": "Durchschnitt",
       "at": "um {{time}}",
-      "chartLabel": "Liniendiagramm des heutigen Day-Ahead-Preises in {{unit}}. Niedrigster Preis {{low}}, höchster {{high}}."
+      "chartLabel": "Liniendiagramm des heutigen Day-Ahead-Preises in {{unit}}. Niedrigster Preis {{low}}, höchster {{high}}.",
+      "tableCaption": "Day-Ahead-Preis heute nach Uhrzeit, in deutscher Zeit ({{zone}})",
+      "column": "Preis ({{unit}})"
     },
     "generation": {
       "error": "Die Erzeugungsdaten konnten nicht geladen werden.",
       "empty": "Die Erzeugungsdaten für heute liegen noch nicht vor.",
-      "note": "Energie pro Stunde in MWh, nur vollständige Stunden. Die Zeiten sind in deutscher Zeit ({{zone}})."
+      "note": "Energie pro Stunde in MWh, nur vollständige Stunden. Die Zeiten sind in deutscher Zeit ({{zone}}).",
+      "tableCaption": "Stromerzeugung heute nach Quelle, in MWh pro Stunde, in deutscher Zeit ({{zone}})",
+      "total": "Gesamt"
     },
     "renewable": {
       "title": "Erneuerbarer Anteil heute",
@@ -79,7 +83,12 @@
     "loading": "Diagramm wird geladen…",
     "empty": "Keine Daten vorhanden.",
     "error": "Das Diagramm konnte nicht geladen werden.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "table": {
+      "show": "Daten als Tabelle anzeigen",
+      "time": "Uhrzeit",
+      "missing": "keine Daten"
+    }
   },
   "generation": {
     "title": "Strommix heute",

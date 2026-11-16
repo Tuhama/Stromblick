@@ -40,12 +40,16 @@
       "high": "Highest",
       "average": "Average",
       "at": "at {{time}}",
-      "chartLabel": "Line chart of today's day-ahead price in {{unit}}. Lowest {{low}}, highest {{high}}."
+      "chartLabel": "Line chart of today's day-ahead price in {{unit}}. Lowest {{low}}, highest {{high}}.",
+      "tableCaption": "Day-ahead price today by time, in German time ({{zone}})",
+      "column": "Price ({{unit}})"
     },
     "generation": {
       "error": "The generation figures couldn't be loaded.",
       "empty": "Today's generation figures aren't available yet.",
-      "note": "Energy per hour in MWh, for complete hours only. Times are in German time ({{zone}})."
+      "note": "Energy per hour in MWh, for complete hours only. Times are in German time ({{zone}}).",
+      "tableCaption": "Electricity generation today by source, in MWh per hour, in German time ({{zone}})",
+      "total": "Total"
     },
     "renewable": {
       "title": "Renewable share today",
@@ -79,7 +83,12 @@
     "loading": "Loading the chart…",
     "empty": "There is no data to show.",
     "error": "The chart couldn't be loaded.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "table": {
+      "show": "Show the data as a table",
+      "time": "Time",
+      "missing": "no data"
+    }
   },
   "generation": {
     "title": "Generation mix today",

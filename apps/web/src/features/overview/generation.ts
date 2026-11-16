@@ -1,5 +1,6 @@
 import type { Point } from "@stromblick/shared";
 import type { ChartColors } from "../../charts/chart-colors";
+import type { DataTableRow } from "../../charts/DataTable";
 import { downsample, MAX_CHART_POINTS } from "../../charts/downsample";
 import type { ChartOption } from "../../charts/echarts";
 import { timeAxis } from "../../charts/time-axis";
@@ -184,6 +185,27 @@ export function keepCommonTimes(series: readonly GenerationSeries[]): Generation
     key: entry.key,
     points: entry.points.filter(([time]) => common.has(time)),
   }));
+}
+
+/**
+ * The table behind the stacked chart: one row per hour, one value per layer in the layers' order, and
+ * the hour's total last. A layer without a reading in an hour gives null, not 0: nothing was reported.
+ */
+export function generationRows(layers: readonly GenerationLayer[]): DataTableRow[] {
+  const byTime = new Map<number, (number | null)[]>();
+  layers.forEach((layer, column) => {
+    for (const [time, value] of layer.points) {
+      const row = byTime.get(time) ?? layers.map(() => null);
+      row[column] = value;
+      byTime.set(time, row);
+    }
+  });
+  return [...byTime]
+    .sort((a, b) => a[0] - b[0])
+    .map(([time, values]) => ({
+      time,
+      values: [...values, values.reduce<number>((sum, value) => sum + (value ?? 0), 0)],
+    }));
 }
 
 /** Renewable generation as a share of all generation, from 0 to 1, or null without any generation. */

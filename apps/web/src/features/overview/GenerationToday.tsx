@@ -1,9 +1,10 @@
 import { lazy, Suspense, useId, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { ChartPanel } from "../../charts/ChartPanel";
+import { DataTable } from "../../charts/DataTable";
 import { currentLanguage } from "../../i18n";
 import { berlinZoneName, todayInBerlin } from "../../time/berlin";
-import { groupGeneration } from "./generation";
+import { formatEnergy, generationRows, groupGeneration } from "./generation";
 import { useTodaysGeneration } from "./use-generation";
 
 // Its own chunk, like the price chart: ECharts is downloaded after the page is on screen.
@@ -22,6 +23,8 @@ export function GenerationToday() {
   );
   // The zone name (CET or CEST) is that of the day shown; today's date at noon is always inside it.
   const zoneMoment = layers[0]?.points.at(-1)?.[0] ?? Date.parse(`${todayInBerlin()}T12:00:00Z`);
+  const language = currentLanguage();
+  const tableRows = useMemo(() => generationRows(layers), [layers]);
 
   return (
     <section aria-labelledby={titleId}>
@@ -43,8 +46,19 @@ export function GenerationToday() {
             <GenerationChart layers={layers} unit="MWh" />
           </Suspense>
           <p className="mt-4 text-sm text-muted-foreground">
-            {t("overview.generation.note", { zone: berlinZoneName(zoneMoment, currentLanguage()) })}
+            {t("overview.generation.note", { zone: berlinZoneName(zoneMoment, language) })}
           </p>
+          <DataTable
+            caption={t("overview.generation.tableCaption", {
+              zone: berlinZoneName(zoneMoment, language),
+            })}
+            columns={[
+              ...layers.map((layer) => t(`generation.groups.${layer.id}`)),
+              t("overview.generation.total"),
+            ]}
+            rows={tableRows}
+            formatValue={(value) => formatEnergy(value, language)}
+          />
         </ChartPanel>
       </div>
     </section>
