@@ -43,9 +43,10 @@ export function createApp({
 }: AppOptions) {
   const app = express();
 
-  // Behind Railway's edge, which replaces X-Forwarded-For with the address it saw. So req.ip is that
-  // address and a visitor cannot forge it. For requests that come through the Vercel rewrite it is
-  // Vercel's address, not the visitor's: the limits below therefore cap the whole site's traffic.
+  // Behind Railway's edge, which overwrites X-Forwarded-For and X-Real-IP with the address it saw.
+  // The number of proxies in front of the app is not fixed, so req.ip can change between requests;
+  // the rate limiter keys on X-Real-IP instead (see middleware/rate-limit.ts). For requests that
+  // come through the Vercel rewrite that address is Vercel's, not the visitor's.
   app.set("trust proxy", 1);
 
   app.use(
