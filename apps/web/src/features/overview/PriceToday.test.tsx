@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import i18n from "i18next";
 import { describe, expect, it, vi } from "vitest";
@@ -179,5 +179,23 @@ describe("PriceToday", () => {
     renderPriceToday();
 
     expect(await screen.findByText("The prices couldn't be loaded.")).toBeInTheDocument();
+  });
+  it("keeps the last prices, with a warning, when a refresh fails", async () => {
+    const fetchMock = stubFetch(READINGS);
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={client}>
+        <PriceToday />
+      </QueryClientProvider>,
+    );
+    await screen.findByRole("img");
+
+    // The API goes down: the next refresh fails.
+    fetchMock.mockImplementation(() => Promise.resolve(Response.json({}, { status: 500 })));
+    await act(() => client.refetchQueries());
+
+    expect(await screen.findByText(/Couldn't refresh/)).toBeInTheDocument();
+    expect(screen.getByRole("img")).toBeInTheDocument();
+    expect(screen.queryByText("The prices couldn't be loaded.")).not.toBeInTheDocument();
   });
 });

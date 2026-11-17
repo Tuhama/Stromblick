@@ -32,7 +32,8 @@ export function PriceToday() {
   const summary = points && summarizePrices(points);
   let status: ChartStatus = "ready";
   if (readings.isPending) status = "loading";
-  else if (readings.isError) status = "error";
+  // An error only counts when there is nothing to show: a failed refresh keeps the last prices.
+  else if (readings.isError && !readings.data) status = "error";
   else if (!summary) status = "empty";
 
   return (
@@ -69,6 +70,7 @@ export function PriceToday() {
             error: t("overview.price.error"),
             empty: t("overview.price.empty"),
           }}
+          refreshFailed={readings.isRefetchError}
           onRetry={() => void readings.refetch()}
         >
           {summary && (

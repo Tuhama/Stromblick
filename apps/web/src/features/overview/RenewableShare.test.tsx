@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import i18n from "i18next";
 import { describe, expect, it, vi } from "vitest";
 import { RenewableShare } from "./RenewableShare";
@@ -146,5 +146,28 @@ describe("GenerationToday", () => {
     expect(
       await screen.findByText("Today's generation figures aren't available yet."),
     ).toBeInTheDocument();
+  });
+  it("keeps the last data, with a warning, when a refresh fails", async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={client}>
+        <RenewableShare />
+        <GenerationToday />
+      </QueryClientProvider>,
+    );
+    expect(await screen.findByText("55%")).toBeInTheDocument();
+    await screen.findByRole("img", { name: "generation chart" });
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>(() => Promise.resolve(Response.json({}, { status: 500 }))),
+    );
+    await act(() => client.refetchQueries());
+
+    expect(await screen.findByText(/Couldn't refresh/)).toBeInTheDocument();
+    // The share and the chart still show the data from before.
+    expect(screen.getByText("55%")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "generation chart" })).toBeInTheDocument();
+    expect(screen.queryByText("The share couldn't be calculated.")).not.toBeInTheDocument();
   });
 });
