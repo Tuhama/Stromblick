@@ -1,0 +1,9 @@
+[
+  { "name": "Initial JavaScript", "path": "dist/assets/index-*.js", "limit": "150 kB" },
+  { "name": "Stylesheet", "path": "dist/assets/*.css", "limit": "5 kB" },
+  {
+    "name": "Chart code (loaded later)",
+    "path": ["dist/assets/*.js", "!dist/assets/index-*.js"],
+    "limit": "150 kB"
+  }
+]
