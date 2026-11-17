@@ -32,6 +32,7 @@ const app = createApp({
   },
   readings: (request) => loadReadings(db, request),
   status: () => loadStatus(db),
+  rateLimitPerMinute: env.RATE_LIMIT_PER_MINUTE,
 });
 
 const stopIngestTimer =

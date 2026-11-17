@@ -9,6 +9,7 @@ describe("loadEnv", () => {
   it("applies defaults", () => {
     expect(loadEnv(required)).toMatchObject({
       PORT: 3001,
+      RATE_LIMIT_PER_MINUTE: 300,
       CORS_ORIGINS: ["http://localhost:5173"],
     });
   });
@@ -16,6 +17,13 @@ describe("loadEnv", () => {
   it("parses comma-separated origins", () => {
     const env = loadEnv({ ...required, CORS_ORIGINS: "https://a.example, https://b.example" });
     expect(env.CORS_ORIGINS).toEqual(["https://a.example", "https://b.example"]);
+  });
+
+  it("reads the rate limit and rejects a zero one", () => {
+    expect(loadEnv({ ...required, RATE_LIMIT_PER_MINUTE: "50" }).RATE_LIMIT_PER_MINUTE).toBe(50);
+    expect(() => loadEnv({ ...required, RATE_LIMIT_PER_MINUTE: "0" })).toThrow(
+      /RATE_LIMIT_PER_MINUTE/,
+    );
   });
 
   it("rejects an invalid port", () => {

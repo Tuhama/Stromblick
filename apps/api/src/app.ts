@@ -6,6 +6,7 @@ import { pinoHttp } from "pino-http";
 import type { Logger } from "pino";
 import { healthRouter } from "./routes/health";
 import { errorHandler, notFound } from "./middleware/error-handler";
+import { DEFAULT_RATE_LIMIT_PER_MINUTE, rateLimiter } from "./middleware/rate-limit";
 import { ingestRouter, type IngestRouteOptions } from "./routes/ingest";
 import { seriesRouter } from "./routes/series";
 import { statusRouter } from "./routes/status";
@@ -13,6 +14,8 @@ import type { LoadReadings } from "./series/load-readings";
 import type { LoadStatus } from "./status/load-status";
 
 const REQUEST_ID_HEADER = "x-request-id";
+/** POST /ingest is called by the timer and one workflow; anything beyond a few tries a minute is a guesser. */
+const INGEST_LIMIT_PER_MINUTE = 10;
 
 export interface AppOptions {
   logger: Logger;
@@ -25,6 +28,8 @@ export interface AppOptions {
   readings: LoadReadings;
   /** Reads when the data was last updated; the database in production, a stub in tests. */
   status: LoadStatus;
+  /** Requests per minute and client address for the data routes. Defaults to 300. */
+  rateLimitPerMinute?: number;
 }
 
 export function createApp({
@@ -34,10 +39,13 @@ export function createApp({
   ingest,
   readings,
   status,
+  rateLimitPerMinute = DEFAULT_RATE_LIMIT_PER_MINUTE,
 }: AppOptions) {
   const app = express();
 
-  // Behind Railway's proxy, so req.ip is the client, not the proxy.
+  // Behind Railway's edge, which replaces X-Forwarded-For with the address it saw. So req.ip is that
+  // address and a visitor cannot forge it. For requests that come through the Vercel rewrite it is
+  // Vercel's address, not the visitor's: the limits below therefore cap the whole site's traffic.
   app.set("trust proxy", 1);
 
   app.use(
@@ -71,8 +79,11 @@ export function createApp({
   app.use(cors({ origin: corsOrigins, exposedHeaders: [REQUEST_ID_HEADER] }));
   app.use(express.json({ limit: "100kb" }));
 
+  // Railway's health check must never be answered with 429.
   app.use(healthRouter(checkDatabase));
+  app.use("/ingest", rateLimiter(INGEST_LIMIT_PER_MINUTE));
   app.use(ingestRouter(ingest));
+  app.use(rateLimiter(rateLimitPerMinute));
   app.use(seriesRouter(readings));
   app.use(statusRouter(status));
   app.use(notFound);
