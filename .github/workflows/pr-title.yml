@@ -1,0 +1,33 @@
+name: PR title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  title:
+    # This name is what you select as the required check on main.
+    name: conventional-title
+    # Dependabot sets its own prefix in dependabot.yml; grouped or two-package titles can exceed 100 characters.
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      HUSKY: 0
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      # Only the root project: commitlint lives in the root devDependencies, so this takes seconds.
+      - run: pnpm install --frozen-lockfile --filter stromblick
+      # Same config as the local commit-msg hook (commitlint.config.mjs), so the two always agree.
+      - run: echo "$PR_TITLE" | pnpm exec commitlint
+        env:
+          # Via env var, never `${{ }}` inside the script: a title like `"; curl evil` would run as shell.
+          PR_TITLE: ${{ github.event.pull_request.title }}
