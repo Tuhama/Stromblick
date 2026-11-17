@@ -56,7 +56,8 @@
       "note": "Solar, Wind, Biomasse, Wasserkraft und sonstige Erneuerbare als Anteil an der gesamten bisher heute in Deutschland erzeugten Strommenge. Pumpspeicher zählen nicht als erneuerbar.",
       "error": "Der Anteil konnte nicht berechnet werden.",
       "empty": "Heute noch nicht verfügbar."
-    }
+    },
+    "outdated": "Die Daten sind nicht aktuell: Die letzte erfolgreiche Aktualisierung war {{ago}}. Die Diagramme zeigen die neuesten Daten, die wir haben."
   },
   "tomorrow": {
     "title": "Morgen",
@@ -77,7 +78,9 @@
   },
   "error": {
     "title": "Etwas ist schiefgelaufen",
-    "text": "Die Seite konnte nicht angezeigt werden. Bitte lade sie neu."
+    "text": "Die Seite konnte nicht angezeigt werden. Bitte lade sie neu.",
+    "section": "„{{section}}“ konnte nicht angezeigt werden.",
+    "reload": "Seite neu laden"
   },
   "chart": {
     "loading": "Diagramm wird geladen…",
@@ -88,7 +91,8 @@
       "show": "Daten als Tabelle anzeigen",
       "time": "Uhrzeit",
       "missing": "keine Daten"
-    }
+    },
+    "refreshFailed": "Die Aktualisierung ist fehlgeschlagen. Das sind die zuletzt empfangenen Daten."
   },
   "generation": {
     "title": "Strommix heute",
@@ -103,5 +107,8 @@
       "lignite": "Braunkohle",
       "other": "Sonstige"
     }
+  },
+  "notice": {
+    "warning": "Hinweis:"
   }
 }
