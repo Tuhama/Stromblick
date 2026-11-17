@@ -49,6 +49,22 @@ describe("rate limiting", () => {
       200,
     );
   });
+  it("prefers the X-Real-IP header Railway sets over the proxy chain", async () => {
+    const app = makeApp(1);
+    const first = request(app).get("/status").set("X-Real-IP", "198.51.100.7");
+    // Different proxy addresses, same caller: still one count.
+    expect((await first.set("X-Forwarded-For", "10.0.0.1")).status).toBe(200);
+    const again = request(app).get("/status").set("X-Real-IP", "198.51.100.7");
+    expect((await again.set("X-Forwarded-For", "10.0.0.2")).status).toBe(429);
+    const other = request(app).get("/status").set("X-Real-IP", "198.51.100.8");
+    expect((await other.set("X-Forwarded-For", "10.0.0.1")).status).toBe(200);
+  });
+
+  it("groups IPv6 addresses of one /64 together", async () => {
+    const app = makeApp(1);
+    expect((await request(app).get("/status").set("X-Real-IP", "2001:db8::1")).status).toBe(200);
+    expect((await request(app).get("/status").set("X-Real-IP", "2001:db8::2")).status).toBe(429);
+  });
 
   it("never limits the health check", async () => {
     const app = makeApp(1);
