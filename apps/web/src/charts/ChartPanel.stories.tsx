@@ -15,6 +15,8 @@ export const Ready: Story = {};
 export const Loading: Story = { args: { status: "loading" } };
 export const Empty: Story = { args: { status: "empty" } };
 export const Error: Story = { args: { status: "error" } };
+/** A refresh failed, but the last data is still shown, with a warning. */
+export const RefreshFailed: Story = { args: { refreshFailed: true } };
 
 /** A page can say something more specific than the generic texts. */
 export const OwnWords: Story = {

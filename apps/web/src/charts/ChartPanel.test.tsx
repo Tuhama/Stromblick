@@ -43,4 +43,23 @@ describe("ChartPanel", () => {
     rerender(<ChartPanel status="error">the chart</ChartPanel>);
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
+  it("keeps showing the chart when a refresh failed, with a warning and a retry", async () => {
+    const onRetry = vi.fn();
+    render(
+      <ChartPanel status="ready" refreshFailed onRetry={onRetry}>
+        the chart
+      </ChartPanel>,
+    );
+    expect(screen.getByText("the chart")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Warning: Couldn't refresh. This is the last data we received.",
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Try again" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+  });
+
+  it("shows no warning when the refresh worked", () => {
+    render(<ChartPanel status="ready">the chart</ChartPanel>);
+    expect(screen.queryByText("Warning:")).not.toBeInTheDocument();
+  });
 });

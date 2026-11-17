@@ -40,6 +40,7 @@ export function GenerationToday() {
             error: t("overview.generation.error"),
             empty: t("overview.generation.empty"),
           }}
+          refreshFailed={generation.refreshFailed}
           onRetry={generation.retry}
         >
           <Suspense fallback={<div className="h-72" />}>
