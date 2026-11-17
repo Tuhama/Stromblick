@@ -5,14 +5,15 @@ Short records of the decisions that shape Stromblick: what we chose, why, and wh
 One file per decision, numbered in order. A record is never rewritten: when a decision changes,
 a new record supersedes the old one, and the old one's status links to it.
 
-| #                                               | Decision                                                     | Status   |
-| ----------------------------------------------- | ------------------------------------------------------------ | -------- |
-| [0001](0001-record-architecture-decisions.md)   | Record architecture decisions                                | Accepted |
-| [0002](0002-aggregate-readings-in-postgres.md)  | Aggregate readings in Postgres instead of LTTB               | Accepted |
-| [0003](0003-design-tokens-before-components.md) | Design tokens now, shadcn/ui components when they are needed | Accepted |
-| [0004](0004-ingest-timer-inside-the-api.md)     | Run the ingest on a timer inside the API                     | Accepted |
-| [0005](0005-typescript-6-alias-for-linting.md)  | Alias the root `typescript` to 6.x for typescript-eslint     | Accepted |
-| [0006](0006-echarts-for-charts.md)              | Draw charts with ECharts, imported part by part              | Accepted |
+| #                                                      | Decision                                                     | Status   |
+| ------------------------------------------------------ | ------------------------------------------------------------ | -------- |
+| [0001](0001-record-architecture-decisions.md)          | Record architecture decisions                                | Accepted |
+| [0002](0002-aggregate-readings-in-postgres.md)         | Aggregate readings in Postgres instead of LTTB               | Accepted |
+| [0003](0003-design-tokens-before-components.md)        | Design tokens now, shadcn/ui components when they are needed | Accepted |
+| [0004](0004-ingest-timer-inside-the-api.md)            | Run the ingest on a timer inside the API                     | Accepted |
+| [0005](0005-typescript-6-alias-for-linting.md)         | Alias the root `typescript` to 6.x for typescript-eslint     | Accepted |
+| [0006](0006-echarts-for-charts.md)                     | Draw charts with ECharts, imported part by part              | Accepted |
+| [0007](0007-rate-limit-by-client-address-in-memory.md) | Rate-limit the API by client address, in memory              | Accepted |
 
 ## Adding a record
 
