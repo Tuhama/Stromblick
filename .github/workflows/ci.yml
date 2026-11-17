@@ -49,3 +49,5 @@ jobs:
           DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
       - run: pnpm test
       - run: pnpm build
+      # After the build: it measures the files in apps/web/dist and fails when a budget is exceeded.
+      - run: pnpm --filter @stromblick/web size

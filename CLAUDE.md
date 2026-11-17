@@ -11,6 +11,7 @@ pnpm + Turborepo monorepo:
 
 - pnpm dev: web (port 5173) and api (port 3001) together
 - pnpm lint | pnpm format | pnpm typecheck | pnpm test | pnpm build
+- pnpm --filter @stromblick/web size: bundle budget (brotli sizes of the built files; run after `pnpm build`). CI fails when it is exceeded. Raise a limit in apps/web/.size-limit.json only in a PR that says why.
 - One package only: pnpm --filter @stromblick/<web|api|shared> <script>
 
 ## Architecture rules
