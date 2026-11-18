@@ -100,6 +100,14 @@ describe("tools", () => {
     ]);
   });
 
+  it("hands the provider's own data for a turn back unchanged with the next request", async () => {
+    const providerData = [{ opaque: "signature" }];
+    const { llm, events } = run([{ ...asking(), providerData }, { text: ["Ok."] }]);
+    await events;
+    const assistant = llm.requests[1]?.messages.find((message) => message.role === "assistant");
+    expect(assistant).toMatchObject({ providerData });
+  });
+
   it("lets the model see a tool's HttpError message and carry on", async () => {
     const tool = echoTool(() => Promise.reject(new HttpError(400, "from must not be after to")));
     const { llm, events } = run([asking(), { text: ["Sorry."] }], { tools: [tool] });
