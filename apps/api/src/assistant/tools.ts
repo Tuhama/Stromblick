@@ -1,0 +1,143 @@
+import { z } from "zod";
+import {
+  CalendarDay,
+  MARKET_TIME_ZONE,
+  Resolution,
+  SeriesKey,
+  StatusResponse,
+  type Point,
+} from "@stromblick/shared";
+import { HttpError } from "../errors";
+import type { LoadReadings } from "../series/load-readings";
+import { queryReadings } from "../series/query-readings";
+import { SMARD_SERIES } from "../smard/catalog";
+import type { LoadStatus } from "../status/load-status";
+import type { ToolSpec } from "./llm-client";
+
+/** More points than this are summarised instead of listed: the answer must stay small for the model. */
+export const MAX_LISTED_POINTS = 200;
+
+export interface AssistantTool {
+  spec: ToolSpec;
+  /** Validates the model's arguments and returns data as a JSON string. Throws HttpError with a safe message. */
+  run: (args: unknown) => Promise<string>;
+}
+
+export interface ToolDeps {
+  readings: LoadReadings;
+  status: LoadStatus;
+}
+
+function specFor(name: string, description: string, schema: z.ZodType): ToolSpec {
+  // The "$schema" marker is for validators; model providers don't want it among the parameters.
+  const parameters = Object.fromEntries(
+    Object.entries(z.toJSONSchema(schema, { io: "input" })).filter(([key]) => key !== "$schema"),
+  );
+  return { name, description, parameters };
+}
+
+function parseArgs<S extends z.ZodType>(schema: S, args: unknown): z.output<S> {
+  const result = schema.safeParse(args);
+  if (!result.success) throw new HttpError(400, z.prettifyError(result.error));
+  return result.data;
+}
+
+const berlinTime = new Intl.DateTimeFormat("sv-SE", {
+  timeZone: MARKET_TIME_ZONE,
+  dateStyle: "short",
+  timeStyle: "short",
+});
+
+/** "2026-11-17 14:00": Berlin local time, which is how the dashboard labels times. */
+function formatTime(epochMs: number): string {
+  return berlinTime.format(epochMs);
+}
+
+const NoArgs = z.object({});
+
+const ReadingsArgs = z.object({
+  series: SeriesKey.describe("A series key from list_series, e.g. price-day-ahead"),
+  from: CalendarDay.describe("First day, YYYY-MM-DD, Europe/Berlin calendar day"),
+  to: CalendarDay.describe("Last day, YYYY-MM-DD, included"),
+  resolution: Resolution.optional().describe(
+    "quarterhour, hour or day; leave out to let the server choose",
+  ),
+});
+
+function summarise(points: readonly Point[]) {
+  const first = points[0];
+  if (first === undefined) return null;
+  let min = first;
+  let max = first;
+  let total = 0;
+  for (const point of points) {
+    if (point[1] < min[1]) min = point;
+    if (point[1] > max[1]) max = point;
+    total += point[1];
+  }
+  const entry = ([time, value]: Point) => ({ time: formatTime(time), value });
+  return {
+    min: entry(min),
+    max: entry(max),
+    average: total / points.length,
+    total,
+  };
+}
+
+export function createTools({ readings, status }: ToolDeps): AssistantTool[] {
+  return [
+    {
+      spec: specFor(
+        "list_series",
+        "Lists the data series you can read: key, what it measures, unit and names in English and German.",
+        NoArgs,
+      ),
+      run: (args) => {
+        parseArgs(NoArgs, args);
+        const series = SMARD_SERIES.map(({ key, kind, unit, name }) => ({ key, kind, unit, name }));
+        return Promise.resolve(JSON.stringify({ series }));
+      },
+    },
+    {
+      spec: specFor(
+        "get_readings",
+        "Reads one series between two days (Europe/Berlin calendar days, both included, at most 366 days). " +
+          "Returns min, max, average and total of the range, and the points when there are at most " +
+          `${MAX_LISTED_POINTS}. Times are Europe/Berlin local time.`,
+        ReadingsArgs,
+      ),
+      run: async (args) => {
+        const { series, ...query } = parseArgs(ReadingsArgs, args);
+        const result = await queryReadings(readings, series, query);
+        const summary = summarise(result.points);
+        const listed = result.points.length <= MAX_LISTED_POINTS;
+        return JSON.stringify({
+          series: result.series,
+          unit: result.unit,
+          resolution: result.resolution,
+          timeZone: MARKET_TIME_ZONE,
+          count: result.points.length,
+          // A total of prices means nothing; of energy it does.
+          summary: summary && (result.unit === "MWh" ? summary : { ...summary, total: undefined }),
+          points: listed
+            ? result.points.map(([time, value]) => ({ time: formatTime(time), value }))
+            : undefined,
+          note: listed
+            ? undefined
+            : `Too many points to list (${result.points.length}). Use a shorter range or resolution "day".`,
+        });
+      },
+    },
+    {
+      spec: specFor(
+        "get_status",
+        "Tells when the data was last updated and whether the latest update succeeded.",
+        NoArgs,
+      ),
+      run: async (args) => {
+        parseArgs(NoArgs, args);
+        return JSON.stringify(StatusResponse.parse(await status()));
+      },
+    },
+  ];
+}
