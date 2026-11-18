@@ -11,6 +11,9 @@ describe("loadEnv", () => {
       PORT: 3001,
       RATE_LIMIT_PER_MINUTE: 300,
       GEMINI_MODEL: "gemini-3.5-flash-lite",
+      ASSISTANT_QUESTIONS_PER_MINUTE: 5,
+      ASSISTANT_MODEL_REQUESTS_PER_MINUTE: 12,
+      ASSISTANT_MODEL_REQUESTS_PER_DAY: 400,
       CORS_ORIGINS: ["http://localhost:5173"],
     });
   });
@@ -33,6 +36,14 @@ describe("loadEnv", () => {
       "k".repeat(30),
     );
     expect(() => loadEnv({ ...required, GEMINI_API_KEY: "short" })).toThrow(/GEMINI_API_KEY/);
+  });
+
+  it("reads the assistant limits and rejects values below 1", () => {
+    const env = loadEnv({ ...required, ASSISTANT_MODEL_REQUESTS_PER_DAY: "100" });
+    expect(env.ASSISTANT_MODEL_REQUESTS_PER_DAY).toBe(100);
+    expect(() => loadEnv({ ...required, ASSISTANT_QUESTIONS_PER_MINUTE: "0" })).toThrow(
+      /ASSISTANT_QUESTIONS_PER_MINUTE/,
+    );
   });
 
   it("rejects an invalid port", () => {
