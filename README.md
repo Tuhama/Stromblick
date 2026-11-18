@@ -23,7 +23,7 @@ tomorrow's cheapest hours and AI explanations, built on the Bundesnetzagentur's
 | Overview: today's generation mix, prices and renewable share   | Next    |
 | Tomorrow: day-ahead prices and the cheapest window             | Planned |
 | Explorer: any series and range, shareable by link              | Planned |
-| Explain a day: AI answers grounded in the dashboard's own data | Planned |
+| Explain a day: AI answers grounded in the dashboard's own data | Live    |
 
 ## Architecture
 
