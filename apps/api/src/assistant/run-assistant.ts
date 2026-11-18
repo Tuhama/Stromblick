@@ -116,6 +116,28 @@ async function executeTool(
 }
 
 /**
+ * Checks the question and the earlier messages against the limits and returns what the model will
+ * see: the trimmed question and the most recent history. Throws HttpError(400) when a limit is
+ * broken. The route calls it before it starts streaming, so a bad request gets a plain 400.
+ */
+export function prepareConversation(
+  question: string,
+  history: Turn[],
+  limits: AssistantLimits = DEFAULT_LIMITS,
+): { question: string; history: Turn[] } {
+  const trimmed = question.trim();
+  if (trimmed === "") throw new HttpError(400, "Ask a question");
+  if (trimmed.length > limits.maxQuestionChars) {
+    throw tooLong("A question", limits.maxQuestionChars);
+  }
+  const recent = history.slice(-limits.maxHistoryMessages);
+  if (recent.some((turn) => turn.text.length > limits.maxHistoryChars)) {
+    throw tooLong("An earlier message", limits.maxHistoryChars);
+  }
+  return { question: trimmed, history: recent };
+}
+
+/**
  * Answers one question: streams the model's text, runs the tools it asks for (at most
  * `maxToolCalls`), and stops. The question goes only into the user message; the system prompt is
  * fixed. Throws HttpError(400) for an empty or too long question or history message.
@@ -129,15 +151,7 @@ export async function* runAssistant({
   limits = DEFAULT_LIMITS,
   signal,
 }: AssistantRun): AsyncGenerator<AssistantEvent> {
-  const trimmed = question.trim();
-  if (trimmed === "") throw new HttpError(400, "Ask a question");
-  if (trimmed.length > limits.maxQuestionChars) {
-    throw tooLong("A question", limits.maxQuestionChars);
-  }
-  const recent = history.slice(-limits.maxHistoryMessages);
-  if (recent.some((turn) => turn.text.length > limits.maxHistoryChars)) {
-    throw tooLong("An earlier message", limits.maxHistoryChars);
-  }
+  const { question: trimmed, history: recent } = prepareConversation(question, history, limits);
 
   const messages: ChatMessage[] = [
     ...recent.map((turn): ChatMessage => {
