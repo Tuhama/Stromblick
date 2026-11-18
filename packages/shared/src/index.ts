@@ -5,3 +5,4 @@ export * from "./readings";
 export * from "./ingest";
 export * from "./status";
 export * from "./market";
+export * from "./assistant";
