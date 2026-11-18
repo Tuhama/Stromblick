@@ -69,7 +69,40 @@
   },
   "explain": {
     "title": "Explain a day",
-    "intro": "Pick a day and get an explanation of what happened on the electricity market."
+    "intro": "Ask about a day on the electricity market. Answers come from the same data as the charts."
+  },
+  "assistant": {
+    "label": "Assistant",
+    "emptyIntro": "Ask about generation, prices or the renewable share. Try one of these:",
+    "starters": {
+      "priceRange": "What was the day-ahead price range yesterday?",
+      "windSolar": "How much electricity did wind and solar produce yesterday?",
+      "updated": "When was the data last updated?"
+    },
+    "you": "You",
+    "assistant": "Assistant",
+    "inputLabel": "Your question",
+    "placeholder": "Ask a question…",
+    "hint": "Enter sends, Shift+Enter starts a new line.",
+    "count": "{{used}} of {{max}} characters",
+    "send": "Send",
+    "stop": "Stop",
+    "newChat": "New conversation",
+    "retry": "Try again",
+    "thinking": "Thinking…",
+    "lookingUp": "Looking up data…",
+    "truncated": "The answer reached its length limit and may be cut off.",
+    "privacy": "Your questions are sent to Google's Gemini service (free tier), which may use them to improve its products. Please don't enter personal data. The assistant can be wrong: check important figures in the charts.",
+    "errors": {
+      "rate_limited": "The assistant has used up its free quota for now. Please try again in a few minutes.",
+      "unavailable": "The model service isn't available right now. Please try again in a moment.",
+      "blocked": "The model declined to answer this question. Try asking it differently.",
+      "failed": "Something went wrong while answering. Please try again.",
+      "off": "The assistant is switched off at the moment.",
+      "busy": "Too many questions right now. Please wait a minute and try again.",
+      "invalid": "That question couldn't be sent. Try a shorter one.",
+      "network": "The connection was interrupted. Please try again."
+    }
   },
   "notFound": {
     "title": "Page not found",
