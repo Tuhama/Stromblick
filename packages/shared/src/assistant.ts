@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+/** What the API accepts. The web app uses the same numbers to size its input and to trim the history. */
+export const ASSISTANT_MAX_QUESTION_CHARS = 500;
+/** An earlier message of the conversation that is longer than this is rejected. */
+export const ASSISTANT_MAX_HISTORY_CHARS = 2000;
+/** Older messages than the most recent ones are dropped. */
+export const ASSISTANT_MAX_HISTORY_MESSAGES = 10;
+
 /** An earlier message of the conversation. The client keeps the history and sends it back. */
 export const AssistantTurn = z.object({
   role: z.enum(["user", "assistant"]),

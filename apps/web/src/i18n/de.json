@@ -69,7 +69,40 @@
   },
   "explain": {
     "title": "Tag erklären",
-    "intro": "Wähle einen Tag und erhalte eine Erklärung, was am Strommarkt passiert ist."
+    "intro": "Frag nach einem Tag am Strommarkt. Die Antworten stammen aus denselben Daten wie die Diagramme."
+  },
+  "assistant": {
+    "label": "Assistent",
+    "emptyIntro": "Frag nach Stromerzeugung, Preisen oder dem Anteil erneuerbarer Energien. Zum Beispiel:",
+    "starters": {
+      "priceRange": "Wie war die Spanne des Day-Ahead-Preises gestern?",
+      "windSolar": "Wie viel Strom haben Wind und Sonne gestern erzeugt?",
+      "updated": "Wann wurden die Daten zuletzt aktualisiert?"
+    },
+    "you": "Du",
+    "assistant": "Assistent",
+    "inputLabel": "Deine Frage",
+    "placeholder": "Stell eine Frage …",
+    "hint": "Enter sendet, Umschalt+Enter beginnt eine neue Zeile.",
+    "count": "{{used}} von {{max}} Zeichen",
+    "send": "Senden",
+    "stop": "Stopp",
+    "newChat": "Neues Gespräch",
+    "retry": "Erneut versuchen",
+    "thinking": "Denkt nach …",
+    "lookingUp": "Daten werden abgerufen …",
+    "truncated": "Die Antwort hat die Längengrenze erreicht und ist möglicherweise abgeschnitten.",
+    "privacy": "Deine Fragen werden an Googles Gemini-Dienst (kostenlose Stufe) gesendet, der sie zur Verbesserung seiner Produkte nutzen darf. Bitte gib keine persönlichen Daten ein. Der Assistent kann sich irren: Prüfe wichtige Zahlen in den Diagrammen.",
+    "errors": {
+      "rate_limited": "Der Assistent hat sein kostenloses Kontingent vorerst aufgebraucht. Bitte versuche es in einigen Minuten erneut.",
+      "unavailable": "Der Modelldienst ist gerade nicht erreichbar. Bitte versuche es gleich noch einmal.",
+      "blocked": "Das Modell hat diese Frage nicht beantwortet. Versuche, sie anders zu formulieren.",
+      "failed": "Beim Antworten ist etwas schiefgelaufen. Bitte versuche es erneut.",
+      "off": "Der Assistent ist im Moment abgeschaltet.",
+      "busy": "Gerade gibt es zu viele Fragen. Bitte warte eine Minute und versuche es erneut.",
+      "invalid": "Diese Frage konnte nicht gesendet werden. Versuche eine kürzere.",
+      "network": "Die Verbindung wurde unterbrochen. Bitte versuche es erneut."
+    }
   },
   "notFound": {
     "title": "Seite nicht gefunden",
