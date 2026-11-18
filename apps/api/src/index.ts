@@ -1,12 +1,15 @@
 import { existsSync } from "node:fs";
 import { createApp } from "./app";
+import { createGeminiClientFromKey } from "./assistant/gemini-client";
+import { createModelBudget } from "./assistant/model-budget";
+import { createTools } from "./assistant/tools";
 import { createDb } from "./db";
 import { loadEnv } from "./env";
 import { runIngest } from "./ingest/run";
 import { singleFlight } from "./ingest/single-flight";
 import { startIngestTimer } from "./ingest/timer";
 import { createLogger } from "./logger";
-import { loadReadings } from "./series/load-readings";
+import { loadReadings, type ReadingsRequest } from "./series/load-readings";
 import { createSmardClient } from "./smard/client";
 import { loadStatus } from "./status/load-status";
 import { MINUTE } from "./time-units";
@@ -18,8 +21,35 @@ const env = loadEnv();
 const logger = createLogger(env);
 const db = createDb(env.DATABASE_URL);
 const smard = createSmardClient();
+
 // One guard for both callers: a timer tick and POST /ingest can never run at the same time.
 const ingest = singleFlight(() => runIngest({ db, smard, logger }));
+
+const readings = (request: ReadingsRequest) => loadReadings(db, request);
+
+const status = () => loadStatus(db);
+
+// Without a key the assistant is off: the route answers 503 and nothing else changes.
+const assistant =
+  env.GEMINI_API_KEY === undefined
+    ? undefined
+    : {
+        llm: createGeminiClientFromKey(env.GEMINI_API_KEY, env.GEMINI_MODEL),
+        tools: createTools({ readings, status }),
+        logger,
+        budget: createModelBudget({
+          perMinute: env.ASSISTANT_MODEL_REQUESTS_PER_MINUTE,
+          perDay: env.ASSISTANT_MODEL_REQUESTS_PER_DAY,
+        }),
+        questionsPerMinute: env.ASSISTANT_QUESTIONS_PER_MINUTE,
+      };
+
+logger.info(
+  assistant === undefined
+    ? "Assistant off (GEMINI_API_KEY is unset)"
+    : `Assistant on (model ${env.GEMINI_MODEL})`,
+);
+
 const app = createApp({
   logger,
   corsOrigins: env.CORS_ORIGINS,
@@ -30,9 +60,10 @@ const app = createApp({
     secret: env.INGEST_SECRET,
     run: ingest.run,
   },
-  readings: (request) => loadReadings(db, request),
-  status: () => loadStatus(db),
+  readings,
+  status,
   rateLimitPerMinute: env.RATE_LIMIT_PER_MINUTE,
+  assistant,
 });
 
 const stopIngestTimer =

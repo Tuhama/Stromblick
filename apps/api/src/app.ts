@@ -7,6 +7,7 @@ import type { Logger } from "pino";
 import { healthRouter } from "./routes/health";
 import { errorHandler, notFound } from "./middleware/error-handler";
 import { DEFAULT_RATE_LIMIT_PER_MINUTE, rateLimiter } from "./middleware/rate-limit";
+import { assistantRouter, type AssistantRouteOptions } from "./routes/assistant";
 import { ingestRouter, type IngestRouteOptions } from "./routes/ingest";
 import { seriesRouter } from "./routes/series";
 import { statusRouter } from "./routes/status";
@@ -30,6 +31,8 @@ export interface AppOptions {
   status: LoadStatus;
   /** Requests per minute and client address for the data routes. Defaults to 300. */
   rateLimitPerMinute?: number;
+  /** The AI assistant. Left out, POST /assistant answers 503. */
+  assistant?: AssistantRouteOptions;
 }
 
 export function createApp({
@@ -40,6 +43,7 @@ export function createApp({
   readings,
   status,
   rateLimitPerMinute = DEFAULT_RATE_LIMIT_PER_MINUTE,
+  assistant,
 }: AppOptions) {
   const app = express();
 
@@ -87,6 +91,7 @@ export function createApp({
   app.use(rateLimiter(rateLimitPerMinute));
   app.use(seriesRouter(readings));
   app.use(statusRouter(status));
+  app.use(assistantRouter(assistant));
   app.use(notFound);
   app.use(errorHandler);
   return app;
