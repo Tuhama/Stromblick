@@ -14,6 +14,7 @@ a new record supersedes the old one, and the old one's status links to it.
 | [0005](0005-typescript-6-alias-for-linting.md)         | Alias the root `typescript` to 6.x for typescript-eslint     | Accepted |
 | [0006](0006-echarts-for-charts.md)                     | Draw charts with ECharts, imported part by part              | Accepted |
 | [0007](0007-rate-limit-by-client-address-in-memory.md) | Rate-limit the API by client address, in memory              | Accepted |
+| [0008](0008-gemini-behind-a-neutral-llm-interface.md)  | Use Gemini behind a provider-neutral LLM interface           | Accepted |
 
 ## Adding a record
 

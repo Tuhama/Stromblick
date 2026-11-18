@@ -5,6 +5,8 @@ export interface FakeTurn {
   text?: string[];
   calls?: Omit<ToolCall, "id">[];
   reason?: "stop" | "length";
+  /** Handed back on the `end` event, like a provider's own data for this turn. */
+  providerData?: unknown;
 }
 
 /** Plays a list of events back as an async stream, like a provider's response would arrive. */
@@ -40,7 +42,7 @@ export function scriptedLlm(script: FakeTurn[]): LlmClient & { requests: LlmRequ
           type: "tool_call",
           call: { ...call, id: `call-${String(next)}-${String(index)}` },
         })),
-        { type: "end", reason: turn.reason ?? "stop" },
+        { type: "end", reason: turn.reason ?? "stop", providerData: turn.providerData },
       ];
       return playback(events);
     },

@@ -155,6 +155,7 @@ export async function* runAssistant({
   for (let round = 0; round <= limits.maxToolCalls; round += 1) {
     const calls: ToolCall[] = [];
     let text = "";
+    let providerData: unknown;
     truncated = false;
 
     for await (const event of llm.stream({
@@ -171,12 +172,13 @@ export async function* runAssistant({
         calls.push(event.call);
       } else {
         truncated = event.reason === "length";
+        providerData = event.providerData;
       }
     }
 
     if (calls.length === 0) break;
 
-    messages.push({ role: "assistant", text, toolCalls: calls });
+    messages.push({ role: "assistant", text, toolCalls: calls, providerData });
     for (const call of calls) {
       yield { type: "tool", name: call.name };
       const { result } = await executeTool(call, tools, logger, limits, used);

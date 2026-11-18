@@ -13,6 +13,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@google/genai": "^3.4.0",
     "@prisma/adapter-pg": "catalog:",
     "@prisma/client": "catalog:",
     "@stromblick/shared": "workspace:*",

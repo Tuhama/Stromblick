@@ -10,6 +10,7 @@ describe("loadEnv", () => {
     expect(loadEnv(required)).toMatchObject({
       PORT: 3001,
       RATE_LIMIT_PER_MINUTE: 300,
+      GEMINI_MODEL: "gemini-3.5-flash-lite",
       CORS_ORIGINS: ["http://localhost:5173"],
     });
   });
@@ -24,6 +25,14 @@ describe("loadEnv", () => {
     expect(() => loadEnv({ ...required, RATE_LIMIT_PER_MINUTE: "0" })).toThrow(
       /RATE_LIMIT_PER_MINUTE/,
     );
+  });
+
+  it("keeps the assistant off without a key and rejects a key that is too short", () => {
+    expect(loadEnv(required).GEMINI_API_KEY).toBeUndefined();
+    expect(loadEnv({ ...required, GEMINI_API_KEY: "k".repeat(30) }).GEMINI_API_KEY).toBe(
+      "k".repeat(30),
+    );
+    expect(() => loadEnv({ ...required, GEMINI_API_KEY: "short" })).toThrow(/GEMINI_API_KEY/);
   });
 
   it("rejects an invalid port", () => {
