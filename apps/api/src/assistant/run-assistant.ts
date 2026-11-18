@@ -1,4 +1,9 @@
 import type { Logger } from "pino";
+import {
+  ASSISTANT_MAX_HISTORY_CHARS,
+  ASSISTANT_MAX_HISTORY_MESSAGES,
+  ASSISTANT_MAX_QUESTION_CHARS,
+} from "@stromblick/shared";
 import { HttpError } from "../errors";
 import type { ChatMessage, LlmClient, ToolCall } from "./llm-client";
 import { SYSTEM_PROMPT } from "./system-prompt";
@@ -20,9 +25,9 @@ export interface AssistantLimits {
 }
 
 export const DEFAULT_LIMITS: AssistantLimits = {
-  maxQuestionChars: 500,
-  maxHistoryChars: 2_000,
-  maxHistoryMessages: 10,
+  maxQuestionChars: ASSISTANT_MAX_QUESTION_CHARS,
+  maxHistoryChars: ASSISTANT_MAX_HISTORY_CHARS,
+  maxHistoryMessages: ASSISTANT_MAX_HISTORY_MESSAGES,
   maxToolCalls: 4,
   maxOutputTokens: 800,
   maxToolResultChars: 8_000,
