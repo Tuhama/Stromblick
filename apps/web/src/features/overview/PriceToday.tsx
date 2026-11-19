@@ -1,6 +1,7 @@
 import { lazy, Suspense, useId, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { DAY_AHEAD_PRICE_KEY, type Point } from "@stromblick/shared";
+import { tooManyRequestsMessage } from "../../api/error-message";
 import { useReadings } from "../../api/queries";
 import { ChartPanel, type ChartStatus } from "../../charts/ChartPanel";
 import { DataTable } from "../../charts/DataTable";
@@ -67,7 +68,7 @@ export function PriceToday() {
           status={status}
           messages={{
             loading: t("overview.loading"),
-            error: t("overview.price.error"),
+            error: tooManyRequestsMessage(t, readings.error) ?? t("overview.price.error"),
             empty: t("overview.price.empty"),
           }}
           refreshFailed={readings.isRefetchError}

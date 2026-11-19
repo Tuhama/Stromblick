@@ -180,6 +180,30 @@ describe("PriceToday", () => {
 
     expect(await screen.findByText("The prices couldn't be loaded.")).toBeInTheDocument();
   });
+
+  it("tells a visitor who hit the rate limit how long to wait, in both languages", async () => {
+    const tooMany = () =>
+      Promise.resolve(
+        Response.json(
+          { type: "about:blank", title: "Too Many Requests", status: 429 },
+          { status: 429, headers: { "Retry-After": "30" } },
+        ),
+      );
+    vi.stubGlobal("fetch", vi.fn<typeof fetch>(tooMany));
+    const english = renderPriceToday();
+    expect(
+      await screen.findByText("Too many requests. Please try again in 30 seconds."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("The prices couldn't be loaded.")).not.toBeInTheDocument();
+    english.unmount();
+
+    await act(() => i18n.changeLanguage("de"));
+    renderPriceToday();
+    expect(
+      await screen.findByText("Zu viele Anfragen. Bitte versuche es in 30 Sekunden erneut."),
+    ).toBeInTheDocument();
+  });
+
   it("keeps the last prices, with a warning, when a refresh fails", async () => {
     const fetchMock = stubFetch(READINGS);
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });

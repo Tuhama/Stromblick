@@ -1,5 +1,6 @@
 import { useId, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { tooManyRequestsMessage } from "../../api/error-message";
 import { currentLanguage } from "../../i18n";
 import { formatShare, renewableShare } from "./generation";
 import { useTodaysGeneration } from "./use-generation";
@@ -13,8 +14,9 @@ export function RenewableShare() {
 
   let value: string;
   if (generation.status === "loading") value = t("overview.loading");
-  else if (generation.status === "error") value = t("overview.renewable.error");
-  else if (share === null) value = t("overview.renewable.empty");
+  else if (generation.status === "error") {
+    value = tooManyRequestsMessage(t, generation.error) ?? t("overview.renewable.error");
+  } else if (share === null) value = t("overview.renewable.empty");
   else value = formatShare(share, currentLanguage());
 
   const isNumber =
