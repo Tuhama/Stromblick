@@ -113,7 +113,10 @@
     "title": "Something went wrong",
     "text": "The page could not be shown. Try reloading it.",
     "section": "“{{section}}” couldn't be shown.",
-    "reload": "Reload the page"
+    "reload": "Reload the page",
+    "tooManyRequests_one": "Too many requests. Please try again in {{count}} second.",
+    "tooManyRequests_other": "Too many requests. Please try again in {{count}} seconds.",
+    "tooManyRequestsNoWait": "Too many requests. Please wait a moment and try again."
   },
   "chart": {
     "loading": "Loading the chart…",
