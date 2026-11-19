@@ -17,6 +17,10 @@ describe("shouldRetry", () => {
     expect(shouldRetry(0, new ApiError(404))).toBe(false);
   });
 
+  it("doesn't retry a 429: asking again at once only makes the wait longer", () => {
+    expect(shouldRetry(0, new ApiError(429, undefined, 30))).toBe(false);
+  });
+
   it("doesn't retry a body that breaks the contract", () => {
     const result = StatusResponse.safeParse({ lastSuccessAt: "yesterday", lastRun: null });
     if (result.success) throw new Error("The body should not parse");

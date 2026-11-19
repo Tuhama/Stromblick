@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { HealthResponse } from "@stromblick/shared";
-import { ApiError, getJson } from "./client";
+import { ApiError, getJson, parseRetryAfter } from "./client";
 
 function mockFetch(response: Response) {
   const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(response);
@@ -62,5 +62,38 @@ describe("getJson", () => {
 
     await getJson("/health", HealthResponse, { signal: controller.signal });
     expect(fetchMock.mock.calls[0]?.[1]?.signal).toBe(controller.signal);
+  });
+});
+describe("Retry-After", () => {
+  async function errorFor(retryAfter: string | null) {
+    const headers: Record<string, string> = { "Content-Type": "application/problem+json" };
+    if (retryAfter !== null) headers["Retry-After"] = retryAfter;
+    mockFetch(new Response("{}", { status: 429, headers }));
+    return getJson("/health", HealthResponse).catch((e: unknown) => e);
+  }
+
+  it("is read from a 429 response", async () => {
+    expect(await errorFor("42")).toMatchObject({ status: 429, retryAfterSeconds: 42 });
+  });
+
+  it("is absent when the header is missing", async () => {
+    expect(await errorFor(null)).toMatchObject({ status: 429, retryAfterSeconds: undefined });
+  });
+
+  it.each(["soon", "-5", "0", "1.5", "Wed, 21 Oct 2026 07:28:00 GMT", ""])(
+    "is absent when the header is %j",
+    async (value) => {
+      expect(await errorFor(value)).toMatchObject({ retryAfterSeconds: undefined });
+    },
+  );
+});
+
+describe("parseRetryAfter", () => {
+  it("accepts whole seconds, with spaces around", () => {
+    expect(parseRetryAfter(" 7 ")).toBe(7);
+  });
+
+  it("returns undefined for no header", () => {
+    expect(parseRetryAfter(null)).toBeUndefined();
   });
 });

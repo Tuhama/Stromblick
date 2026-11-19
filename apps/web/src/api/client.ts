@@ -12,13 +12,26 @@ interface Schema<T> {
 export class ApiError extends Error {
   readonly status: number;
   readonly problem: ProblemDetails | undefined;
+  /** How long the API asked us to wait (the Retry-After header). Absent when missing or invalid. */
+  readonly retryAfterSeconds: number | undefined;
 
-  constructor(status: number, problem?: ProblemDetails) {
+  constructor(status: number, problem?: ProblemDetails, retryAfterSeconds?: number) {
     super(problem?.detail ?? problem?.title ?? `Request failed with status ${status}`);
     this.name = "ApiError";
     this.status = status;
     this.problem = problem;
+    this.retryAfterSeconds = retryAfterSeconds;
   }
+}
+
+/**
+ * Reads a Retry-After header as whole seconds. Only the "seconds" form counts: the API sends that
+ * one. A date, a negative number, zero or anything else is treated as not sent.
+ */
+export function parseRetryAfter(value: string | null): number | undefined {
+  if (value === null || !/^\d+$/.test(value.trim())) return undefined;
+  const seconds = Number(value.trim());
+  return seconds > 0 ? seconds : undefined;
 }
 
 /** The ApiError for a response with an error status. Reads its problem details when it has valid ones. */
@@ -26,7 +39,11 @@ export async function toApiError(res: Response): Promise<ApiError> {
   // A proxy or gateway error page is not JSON; treat it as no body.
   const body: unknown = await res.json().catch(() => undefined);
   const problem = ProblemDetails.safeParse(body);
-  return new ApiError(res.status, problem.success ? problem.data : undefined);
+  return new ApiError(
+    res.status,
+    problem.success ? problem.data : undefined,
+    parseRetryAfter(res.headers.get("Retry-After")),
+  );
 }
 
 /**
