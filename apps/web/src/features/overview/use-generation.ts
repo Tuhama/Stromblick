@@ -12,6 +12,8 @@ export interface TodaysGeneration {
   series: GenerationSeries[];
   /** A refresh failed, but an earlier answer is still shown: the data may be out of date. */
   refreshFailed: boolean;
+  /** The error of a series that has nothing to show, for the message (a 429 reads differently). */
+  error: Error | null;
   /** Asks again for the series that failed. */
   retry: () => void;
 }
@@ -22,12 +24,13 @@ export interface TodaysGeneration {
  */
 export function useTodaysGeneration(): TodaysGeneration {
   const today = todayInBerlin();
-  const { isPending, isError, refreshFailed, loaded, retry } = useQueries({
+  const { isPending, isError, error, refreshFailed, loaded, retry } = useQueries({
     queries: GENERATION_KEYS.map((key) => readingsQuery(key, { from: today, to: today })),
     combine: (results) => ({
       isPending: results.some((result) => result.isPending),
       // An error only counts when there is nothing to show: a failed refresh keeps the last data.
       isError: results.some((result) => result.isError && result.data === undefined),
+      error: results.find((result) => result.isError && result.data === undefined)?.error ?? null,
       refreshFailed: results.some((result) => result.isRefetchError),
       loaded: results.map((result, index): GenerationSeries => ({
         key: GENERATION_KEYS[index] ?? "",
@@ -45,5 +48,5 @@ export function useTodaysGeneration(): TodaysGeneration {
   if (isPending) status = "loading";
   else if (isError) status = "error";
   else if (series.every((entry) => entry.points.length === 0)) status = "empty";
-  return { status, series, refreshFailed, retry };
+  return { status, series, refreshFailed, error, retry };
 }

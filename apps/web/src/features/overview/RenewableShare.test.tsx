@@ -18,6 +18,26 @@ describe("RenewableShare", () => {
     expect(screen.getByText(/Pumped storage doesn't count/)).toBeInTheDocument();
   });
 
+  it("tells a visitor who hit the rate limit how long to wait", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>(() =>
+        Promise.resolve(Response.json({}, { status: 429, headers: { "Retry-After": "12" } })),
+      ),
+    );
+    renderWithClient(
+      <>
+        <RenewableShare />
+        <GenerationToday />
+      </>,
+    );
+    // The share and the chart both show the message.
+    expect(
+      await screen.findAllByText("Too many requests. Please try again in 12 seconds."),
+    ).toHaveLength(2);
+    expect(screen.queryByText("The share couldn't be calculated.")).not.toBeInTheDocument();
+  });
+
   it("says so when the readings can't be loaded", async () => {
     vi.stubGlobal(
       "fetch",

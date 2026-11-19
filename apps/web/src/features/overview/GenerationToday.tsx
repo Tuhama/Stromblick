@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ChartPanel } from "../../charts/ChartPanel";
 import { DataTable } from "../../charts/DataTable";
 import { currentLanguage } from "../../i18n";
+import { tooManyRequestsMessage } from "../../api/error-message";
 import { berlinZoneName, todayInBerlin } from "../../time/berlin";
 import { formatEnergy, generationRows, groupGeneration } from "./generation";
 import { useTodaysGeneration } from "./use-generation";
@@ -37,7 +38,7 @@ export function GenerationToday() {
           status={generation.status}
           messages={{
             loading: t("overview.loading"),
-            error: t("overview.generation.error"),
+            error: tooManyRequestsMessage(t, generation.error) ?? t("overview.generation.error"),
             empty: t("overview.generation.empty"),
           }}
           refreshFailed={generation.refreshFailed}

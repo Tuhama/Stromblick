@@ -113,7 +113,10 @@
     "title": "Etwas ist schiefgelaufen",
     "text": "Die Seite konnte nicht angezeigt werden. Bitte lade sie neu.",
     "section": "„{{section}}“ konnte nicht angezeigt werden.",
-    "reload": "Seite neu laden"
+    "reload": "Seite neu laden",
+    "tooManyRequests_one": "Zu viele Anfragen. Bitte versuche es in {{count}} Sekunde erneut.",
+    "tooManyRequests_other": "Zu viele Anfragen. Bitte versuche es in {{count}} Sekunden erneut.",
+    "tooManyRequestsNoWait": "Zu viele Anfragen. Bitte warte einen Moment und versuche es erneut."
   },
   "chart": {
     "loading": "Diagramm wird geladen…",
