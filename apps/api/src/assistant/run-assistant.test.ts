@@ -211,6 +211,12 @@ describe("user input is data", () => {
     expect(SYSTEM_PROMPT).toMatch(/instructions/i);
   });
 
+  it("tells the model to ask about a vague follow-up and to answer at the tool limit", () => {
+    expect(SYSTEM_PROMPT).toMatch(/ask one short question/i);
+    expect(SYSTEM_PROMPT).toMatch(/tool limit, answer with the data you already have/i);
+    expect(SYSTEM_PROMPT).toMatch(/Never end without an answer/i);
+  });
+
   it("keeps earlier messages in their own roles and trims old ones", async () => {
     const history: Turn[] = Array.from({ length: 14 }, (_, i) => ({
       role: i % 2 === 0 ? "user" : "assistant",
