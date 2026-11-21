@@ -131,12 +131,21 @@ export function createTools({ readings, status }: ToolDeps): AssistantTool[] {
     {
       spec: specFor(
         "get_status",
-        "Tells when the data was last updated and whether the latest update succeeded.",
+        "Tells when the data was last updated and whether the latest update succeeded. " +
+          "Times are Europe/Berlin local time.",
         NoArgs,
       ),
       run: async (args) => {
         parseArgs(NoArgs, args);
-        return JSON.stringify(StatusResponse.parse(await status()));
+        const { lastSuccessAt, lastRun } = StatusResponse.parse(await status());
+        return JSON.stringify({
+          timeZone: MARKET_TIME_ZONE,
+          lastSuccessAt: lastSuccessAt && formatTime(Date.parse(lastSuccessAt)),
+          lastRun: lastRun && {
+            status: lastRun.status,
+            finishedAt: formatTime(Date.parse(lastRun.finishedAt)),
+          },
+        });
       },
     },
   ];
