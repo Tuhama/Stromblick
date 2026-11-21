@@ -132,8 +132,34 @@ describe("get_readings", () => {
 });
 
 describe("get_status", () => {
-  it("returns when the data was last updated", async () => {
+  it("returns the times in Berlin time, not UTC, and names the time zone", async () => {
     const result = JSON.parse(await setup().tool("get_status").run({})) as Record<string, unknown>;
-    expect(result.lastSuccessAt).toBe("2026-11-17T10:00:00.000Z");
+    expect(result).toEqual({
+      timeZone: "Europe/Berlin",
+      lastSuccessAt: "2026-11-17 11:00",
+      lastRun: { status: "SUCCEEDED", finishedAt: "2026-11-17 11:00" },
+    });
+  });
+
+  it("uses summer time in summer", async () => {
+    const status = () =>
+      Promise.resolve({
+        lastSuccessAt: "2026-07-01T10:00:00.000Z",
+        lastRun: null,
+      });
+    const tools = createTools({ readings: () => Promise.resolve([]), status });
+    const run = tools.find((t) => t.spec.name === "get_status")?.run;
+    const result = JSON.parse((await run?.({})) ?? "{}") as Record<string, unknown>;
+    expect(result.lastSuccessAt).toBe("2026-07-01 12:00");
+    expect(result.lastRun).toBeNull();
+  });
+
+  it("keeps null before the first ingest", async () => {
+    const status = () => Promise.resolve({ lastSuccessAt: null, lastRun: null });
+    const tools = createTools({ readings: () => Promise.resolve([]), status });
+    const run = tools.find((t) => t.spec.name === "get_status")?.run;
+    const result = JSON.parse((await run?.({})) ?? "{}") as Record<string, unknown>;
+    expect(result.lastSuccessAt).toBeNull();
+    expect(result.lastRun).toBeNull();
   });
 });

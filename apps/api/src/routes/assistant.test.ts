@@ -161,6 +161,12 @@ describe("POST /assistant", () => {
     ]);
   });
 
+  it("sends an error event when the model ends without any text", async () => {
+    const res = await ask(appWith(scriptedLlm([{}])));
+    expect(res.status).toBe(200);
+    expect(parseEvents(res.text)).toEqual([{ type: "error", code: "failed" }]);
+  });
+
   it("turns a model failure into an error event with a code, without any details", async () => {
     const failing: LlmClient = {
       stream: () => {
