@@ -2,6 +2,7 @@ import { pino } from "pino";
 import { describe, expect, it, vi } from "vitest";
 import { HttpError } from "../errors";
 import { scriptedLlm, type FakeTurn } from "./fake-llm";
+import { LlmError } from "./llm-client";
 import {
   DEFAULT_LIMITS,
   runAssistant,
@@ -147,13 +148,48 @@ describe("tools", () => {
   it("stops after the allowed number of tool calls and takes the tools away", async () => {
     const tool = echoTool();
     const limits = { ...DEFAULT_LIMITS, maxToolCalls: 2 };
-    const { llm, events } = run([asking(), asking(), asking()], { tools: [tool], limits });
+    const { llm, events } = run([asking(), asking(), { text: ["That is all I found."] }], {
+      tools: [tool],
+      limits,
+    });
     const result = await events;
 
     expect(tool.run).toHaveBeenCalledTimes(2);
     expect(llm.requests.map((request) => request.tools.length)).toEqual([1, 1, 0]);
     expect(llm.requests).toHaveLength(3);
     expect(result.at(-1)).toEqual({ type: "done", truncated: false });
+  });
+});
+
+describe("an answer with no text", () => {
+  it.each([
+    ["no text at all", [{}]],
+    ["only spaces", [{ text: ["  ", "\n"] }]],
+  ])("fails with %s instead of ending quietly", async (_name, script: FakeTurn[]) => {
+    const { events } = run(script);
+    await expect(events).rejects.toBeInstanceOf(LlmError);
+    await expect(events).rejects.toMatchObject({ kind: "failed" });
+  });
+
+  it("fails when the model uses tools and then stays silent, even after some words", async () => {
+    const { events, log } = run([
+      { text: ["Let me look."], calls: [{ name: "get_value", args: {} }] },
+      {},
+    ]);
+    await expect(events).rejects.toMatchObject({ kind: "failed" });
+    expect(log.lines).toContainEqual(
+      expect.objectContaining({
+        msg: "The model returned no answer",
+        toolCalls: 1,
+        tools: ["get_value"],
+      }),
+    );
+  });
+
+  it("does not write the question into that log line", async () => {
+    const { events, log } = run([{}], { question: "my secret question" });
+    await expect(events).rejects.toBeInstanceOf(LlmError);
+    expect(JSON.stringify(log.lines)).not.toContain("my secret question");
   });
 });
 

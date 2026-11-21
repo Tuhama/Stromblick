@@ -5,7 +5,7 @@ import {
   ASSISTANT_MAX_QUESTION_CHARS,
 } from "@stromblick/shared";
 import { HttpError } from "../errors";
-import type { ChatMessage, LlmClient, ToolCall } from "./llm-client";
+import { LlmError, type ChatMessage, type LlmClient, type ToolCall } from "./llm-client";
 import { SYSTEM_PROMPT } from "./system-prompt";
 import type { AssistantTool } from "./tools";
 
@@ -169,6 +169,8 @@ export async function* runAssistant({
   const specs = tools.map((tool) => tool.spec);
   let used = 0;
   let truncated = false;
+  let lastText = "";
+  const toolNames: string[] = [];
 
   // One round per model turn. After the last allowed tool call the model gets no tools, so it must answer.
   for (let round = 0; round <= limits.maxToolCalls; round += 1) {
@@ -195,15 +197,23 @@ export async function* runAssistant({
       }
     }
 
+    lastText = text;
     if (calls.length === 0) break;
 
     messages.push({ role: "assistant", text, toolCalls: calls, providerData });
     for (const call of calls) {
       yield { type: "tool", name: call.name };
+      toolNames.push(call.name);
       const { result } = await executeTool(call, tools, logger, limits, used);
       used += 1;
       messages.push({ role: "tool", callId: call.id, name: call.name, result });
     }
+  }
+
+  // A model that ends without text would leave the visitor with a blank answer and no error.
+  if (lastText.trim() === "") {
+    logger.warn({ toolCalls: used, tools: toolNames }, "The model returned no answer");
+    throw new LlmError("failed", "The model returned no answer");
   }
 
   yield { type: "done", truncated };
