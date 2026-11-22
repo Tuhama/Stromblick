@@ -2,6 +2,7 @@ import type { Point } from "@stromblick/shared";
 import type { ChartColors } from "../../charts/chart-colors";
 import type { ChartOption } from "../../charts/echarts";
 import { downsample, MAX_CHART_POINTS } from "../../charts/downsample";
+import { breakAtGaps } from "../../charts/gaps";
 import { timeAxis } from "../../charts/time-axis";
 import { readPoint } from "../../charts/tooltip";
 import { formatClock, formatDateTime } from "../../time/berlin";
@@ -91,7 +92,8 @@ export function priceOption({
         showSymbol: false,
         lineStyle: { color: colors.line, width: 2 },
         itemStyle: { color: colors.line },
-        data: drawn.map(([time, price]) => [time, price]),
+        // A hole in the data stops the line; a step line would otherwise hold the price across it.
+        data: breakAtGaps(drawn),
       },
     ],
   };

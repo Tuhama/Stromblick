@@ -87,6 +87,28 @@ describe("generationOption", () => {
       animate: true,
     });
 
+  it("stops every layer at the same hole, so the stack does not bridge it", () => {
+    const hour = 3_600_000;
+    const hours = [0, 1, 2, 5, 6].map((index) => SAMPLE_START + index * hour);
+    const option = generationOption({
+      layers: groupGeneration([
+        { key: "generation-solar", points: hours.map((time): Point => [time, 10]) },
+        { key: "generation-hydro", points: hours.map((time): Point => [time, 2]) },
+      ]),
+      names,
+      unit: "MWh",
+      language: "en",
+      colors,
+      animate: false,
+    });
+    expect(option.series).toHaveLength(2);
+    for (const entry of option.series as { data: unknown[] }[]) {
+      // One point without a value, right after the last hour before the hole.
+      expect(entry.data).toContainEqual([SAMPLE_START + 3 * hour, null]);
+      expect(entry.data).toHaveLength(6);
+    }
+  });
+
   it("stacks one area per group in the group's color", () => {
     const option = build(1, 60);
     expect(option.series).toHaveLength(8);

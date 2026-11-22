@@ -11,14 +11,13 @@ import { MINUTE } from "../../time/units";
 import { useNow } from "../../time/use-now";
 import { isOutdated } from "./freshness";
 import { GenerationToday } from "./GenerationToday";
-import { newestData, type NewestData } from "./newest-data";
+import { formatMoment, newestData, type NewestData } from "./newest-data";
 import { PriceToday } from "./PriceToday";
 import { RenewableShare } from "./RenewableShare";
 
 /** One sentence on how new the data is, or null when nothing is known (an older API, no readings). */
 function newestLine(t: TFunction, language: Language, { prices, generation }: NewestData) {
-  const when = (moment: number) =>
-    `${formatDateTime(moment, language)} ${berlinZoneName(moment, language)}`;
+  const when = (moment: number) => formatMoment(moment, language);
   const items: string[] = [];
   if (prices !== null) items.push(t("overview.newest.prices", { time: when(prices) }));
   if (generation !== null) {

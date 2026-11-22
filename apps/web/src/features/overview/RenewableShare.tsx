@@ -3,21 +3,31 @@ import { useTranslation } from "react-i18next";
 import { tooManyRequestsMessage } from "../../api/error-message";
 import { currentLanguage } from "../../i18n";
 import { formatShare, renewableShare } from "./generation";
+import { formatMoment } from "./newest-data";
 import { useTodaysGeneration } from "./use-generation";
+import { useNewestData } from "./use-newest-data";
 
 /** The renewable share of today's generation, as one large number with its definition. */
 export function RenewableShare() {
   const { t } = useTranslation();
   const titleId = useId();
   const generation = useTodaysGeneration();
+  const newest = useNewestData();
   const share = useMemo(() => renewableShare(generation.series), [generation.series]);
 
   let value: string;
   if (generation.status === "loading") value = t("overview.loading");
   else if (generation.status === "error") {
     value = tooManyRequestsMessage(t, generation.error) ?? t("overview.renewable.error");
-  } else if (share === null) value = t("overview.renewable.empty");
-  else value = formatShare(share, currentLanguage());
+  } else if (share === null) {
+    // Without a share for today, say how far the data does reach.
+    value =
+      newest.generation === null
+        ? t("overview.renewable.empty")
+        : t("overview.renewable.emptyNewest", {
+            time: formatMoment(newest.generation, currentLanguage()),
+          });
+  } else value = formatShare(share, currentLanguage());
 
   const isNumber =
     generation.status !== "loading" && generation.status !== "error" && share !== null;

@@ -1,12 +1,14 @@
 import { lazy, Suspense, useId, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { tooManyRequestsMessage } from "../../api/error-message";
 import { ChartPanel } from "../../charts/ChartPanel";
 import { DataTable } from "../../charts/DataTable";
 import { currentLanguage } from "../../i18n";
-import { tooManyRequestsMessage } from "../../api/error-message";
 import { berlinZoneName, todayInBerlin } from "../../time/berlin";
 import { formatEnergy, generationRows, groupGeneration } from "./generation";
+import { formatMoment } from "./newest-data";
 import { useTodaysGeneration } from "./use-generation";
+import { useNewestData } from "./use-newest-data";
 
 // Its own chunk, like the price chart: ECharts is downloaded after the page is on screen.
 const GenerationChart = lazy(() => import("./GenerationChart"));
@@ -16,6 +18,7 @@ export function GenerationToday() {
   const { t } = useTranslation();
   const titleId = useId();
   const generation = useTodaysGeneration();
+  const newest = useNewestData();
 
   // Groups without any data are left out, so the legend lists only what the chart shows.
   const layers = useMemo(
@@ -39,7 +42,13 @@ export function GenerationToday() {
           messages={{
             loading: t("overview.loading"),
             error: tooManyRequestsMessage(t, generation.error) ?? t("overview.generation.error"),
-            empty: t("overview.generation.empty"),
+            // Without figures for today, say how far the data does reach.
+            empty:
+              newest.generation === null
+                ? t("overview.generation.empty")
+                : t("overview.generation.emptyNewest", {
+                    time: formatMoment(newest.generation, language),
+                  }),
           }}
           refreshFailed={generation.refreshFailed}
           onRetry={generation.retry}

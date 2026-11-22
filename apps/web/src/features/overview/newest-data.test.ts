@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { newestData } from "./newest-data";
+import { formatMoment, newestData } from "./newest-data";
 
 describe("newestData", () => {
   it("takes the newest price as it is", () => {
@@ -39,5 +39,12 @@ describe("newestData", () => {
 
   it("treats a price series without readings as unknown", () => {
     expect(newestData({ "price-day-ahead": null }).prices).toBeNull();
+  });
+});
+
+describe("formatMoment", () => {
+  it("writes the moment in German time with the zone's name", () => {
+    expect(formatMoment(Date.parse("2026-11-22T22:45:00Z"), "en")).toBe("Nov 22, 2026, 23:45 CET");
+    expect(formatMoment(Date.parse("2026-07-01T10:00:00Z"), "de")).toBe("01.07.2026, 12:00 MESZ");
   });
 });
