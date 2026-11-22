@@ -8,6 +8,7 @@ import {
   type Point,
 } from "@stromblick/shared";
 import { HttpError } from "../errors";
+import type { LoadLatest } from "../series/load-latest";
 import type { LoadReadings } from "../series/load-readings";
 import { queryReadings } from "../series/query-readings";
 import { SMARD_SERIES } from "../smard/catalog";
@@ -25,6 +26,7 @@ export interface AssistantTool {
 
 export interface ToolDeps {
   readings: LoadReadings;
+  latest: LoadLatest;
   status: LoadStatus;
 }
 
@@ -51,6 +53,29 @@ const berlinTime = new Intl.DateTimeFormat("sv-SE", {
 /** "2026-11-17 14:00": Berlin local time, which is how the dashboard labels times. */
 function formatTime(epochMs: number): string {
   return berlinTime.format(epochMs);
+}
+
+/** The newest reading of a series in Berlin time, or null when it has none. */
+async function latestOf(latest: LoadLatest, key: string): Promise<string | null> {
+  const item = SMARD_SERIES.find((candidate) => candidate.key === key);
+  if (!item) return null;
+  const time = await latest({
+    seriesId: item.filter,
+    region: item.region,
+    native: item.resolution,
+  });
+  return time === null ? null : formatTime(time);
+}
+
+function noteFor(count: number, listed: boolean, latestReading: string | null | undefined) {
+  if (count === 0) {
+    return latestReading
+      ? `No readings in this range. The newest reading we have is at ${latestReading}.`
+      : "No readings in this range, and the series has no readings at all.";
+  }
+  return listed
+    ? undefined
+    : `Too many points to list (${count}). Use a shorter range or resolution "day".`;
 }
 
 const NoArgs = z.object({});
@@ -84,7 +109,7 @@ function summarise(points: readonly Point[]) {
   };
 }
 
-export function createTools({ readings, status }: ToolDeps): AssistantTool[] {
+export function createTools({ readings, latest, status }: ToolDeps): AssistantTool[] {
   return [
     {
       spec: specFor(
@@ -110,6 +135,8 @@ export function createTools({ readings, status }: ToolDeps): AssistantTool[] {
         const { series, ...query } = parseArgs(ReadingsArgs, args);
         const result = await queryReadings(readings, series, query);
         const summary = summarise(result.points);
+        const latestReading =
+          result.points.length === 0 ? await latestOf(latest, series) : undefined;
         const listed = result.points.length <= MAX_LISTED_POINTS;
         return JSON.stringify({
           series: result.series,
@@ -122,9 +149,9 @@ export function createTools({ readings, status }: ToolDeps): AssistantTool[] {
           points: listed
             ? result.points.map(([time, value]) => ({ time: formatTime(time), value }))
             : undefined,
-          note: listed
-            ? undefined
-            : `Too many points to list (${result.points.length}). Use a shorter range or resolution "day".`,
+          // Only when the range is empty: the newest reading the database holds for this series.
+          latestReading,
+          note: noteFor(result.points.length, listed, latestReading),
         });
       },
     },

@@ -9,6 +9,7 @@ import { runIngest } from "./ingest/run";
 import { singleFlight } from "./ingest/single-flight";
 import { startIngestTimer } from "./ingest/timer";
 import { createLogger } from "./logger";
+import { loadLatest, type LatestRequest } from "./series/load-latest";
 import { loadReadings, type ReadingsRequest } from "./series/load-readings";
 import { createSmardClient } from "./smard/client";
 import { loadStatus } from "./status/load-status";
@@ -27,6 +28,7 @@ const ingest = singleFlight(() => runIngest({ db, smard, logger }));
 
 const readings = (request: ReadingsRequest) => loadReadings(db, request);
 
+const latest = (request: LatestRequest) => loadLatest(db, request);
 const status = () => loadStatus(db);
 
 // Without a key the assistant is off: the route answers 503 and nothing else changes.
@@ -35,7 +37,7 @@ const assistant =
     ? undefined
     : {
         llm: createGeminiClientFromKey(env.GEMINI_API_KEY, env.GEMINI_MODEL),
-        tools: createTools({ readings, status }),
+        tools: createTools({ readings, latest, status }),
         logger,
         budget: createModelBudget({
           perMinute: env.ASSISTANT_MODEL_REQUESTS_PER_MINUTE,

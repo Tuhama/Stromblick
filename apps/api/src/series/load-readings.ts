@@ -17,7 +17,7 @@ export interface ReadingsRequest {
 
 export type LoadReadings = (request: ReadingsRequest) => Promise<Point[]>;
 
-const DB_RESOLUTION = {
+export const DB_RESOLUTION = {
   quarterhour: "QUARTERHOUR",
   hour: "HOUR",
   day: "DAY",
