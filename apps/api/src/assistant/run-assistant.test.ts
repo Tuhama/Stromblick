@@ -10,8 +10,11 @@ import {
   type AssistantLimits,
   type Turn,
 } from "./run-assistant";
-import { SYSTEM_PROMPT } from "./system-prompt";
+import { buildSystemPrompt } from "./system-prompt";
 import type { AssistantTool } from "./tools";
+
+// 23:30 UTC on Friday 20 November is already Saturday 21 November in Berlin (UTC+1).
+const NOW = new Date("2026-11-20T23:30:00Z");
 
 function logCapture() {
   const lines: Record<string, unknown>[] = [];
@@ -50,6 +53,7 @@ function run(
     question?: string;
     history?: Turn[];
     limits?: AssistantLimits;
+    now?: Date;
   } = {},
 ) {
   const llm = scriptedLlm(script);
@@ -62,6 +66,7 @@ function run(
       question: options.question ?? "What is the price?",
       history: options.history,
       limits: options.limits,
+      now: () => options.now ?? NOW,
     }),
   );
   return { llm, log, events };
@@ -200,21 +205,29 @@ describe("user input is data", () => {
     const { llm, events } = run([asking(), { text: ["No."] }], { question: injection });
     await events;
     for (const request of llm.requests) {
-      expect(request.system).toBe(SYSTEM_PROMPT);
+      expect(request.system).toBe(buildSystemPrompt(NOW));
       expect(request.system).not.toContain(injection);
     }
     expect(llm.requests[0]?.messages).toEqual([{ role: "user", text: injection }]);
   });
 
   it("tells the model to treat user text and tool results as data", () => {
-    expect(SYSTEM_PROMPT).toMatch(/data/i);
-    expect(SYSTEM_PROMPT).toMatch(/instructions/i);
+    expect(buildSystemPrompt(NOW)).toMatch(/data/i);
+    expect(buildSystemPrompt(NOW)).toMatch(/instructions/i);
   });
 
   it("tells the model to ask about a vague follow-up and to answer at the tool limit", () => {
-    expect(SYSTEM_PROMPT).toMatch(/ask one short question/i);
-    expect(SYSTEM_PROMPT).toMatch(/tool limit, answer with the data you already have/i);
-    expect(SYSTEM_PROMPT).toMatch(/Never end without an answer/i);
+    const prompt = buildSystemPrompt(NOW);
+    expect(prompt).toMatch(/ask one short question/i);
+    expect(prompt).toMatch(/tool limit, answer with the data you already have/i);
+    expect(prompt).toMatch(/Never end without an answer/i);
+  });
+
+  it("asks for plain text and for the newest reading when there is no data", () => {
+    const prompt = buildSystemPrompt(NOW);
+    expect(prompt).toMatch(/plain text/i);
+    expect(prompt).toMatch(/do not use Markdown/i);
+    expect(prompt).toMatch(/latest reading the tool reports/i);
   });
 
   it("keeps earlier messages in their own roles and trims old ones", async () => {
@@ -280,5 +293,36 @@ describe("logging", () => {
     const { events, log } = run([asking(), { text: ["Ok"] }], { question: secret });
     await events;
     expect(JSON.stringify(log.lines)).not.toContain(secret);
+  });
+});
+
+describe("today's date in the system prompt", () => {
+  it("is the Berlin day, not the UTC day", () => {
+    expect(buildSystemPrompt(NOW)).toContain("Today is Saturday, 2026-11-21 (Europe/Berlin).");
+  });
+
+  it("uses summer time in summer", () => {
+    // 22:30 UTC on 30 June is 00:30 on 1 July in Berlin (UTC+2).
+    const prompt = buildSystemPrompt(new Date("2026-06-30T22:30:00Z"));
+    expect(prompt).toContain("Today is Wednesday, 2026-07-01 (Europe/Berlin).");
+  });
+
+  it("is read again for every request", async () => {
+    const llm = scriptedLlm([{ text: ["a"] }, { text: ["b"] }]);
+    const { logger } = logCapture();
+    let clock = new Date("2026-11-20T10:00:00Z");
+    const ask = () =>
+      collect(runAssistant({ llm, tools: [], logger, question: "Hi", now: () => clock }));
+    await ask();
+    clock = new Date("2026-11-21T10:00:00Z");
+    await ask();
+    expect(llm.requests[0]?.system).toContain("2026-11-20");
+    expect(llm.requests[1]?.system).toContain("2026-11-21");
+  });
+
+  it("never contains the question", async () => {
+    const { llm, events } = run([{ text: ["No."] }], { question: "secret question text" });
+    await events;
+    expect(llm.requests[0]?.system).not.toContain("secret question text");
   });
 });

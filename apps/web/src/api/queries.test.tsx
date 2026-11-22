@@ -24,6 +24,7 @@ describe("useStatus", () => {
     const status: StatusResponse = {
       lastSuccessAt: "2026-11-10T19:00:05.000Z",
       lastRun: { status: "SUCCEEDED", finishedAt: "2026-11-10T19:00:05.000Z" },
+      latestReadings: { "price-day-ahead": "2026-11-11T22:45:00.000Z", load: null },
     };
     const fetchMock = stubFetch(status);
 

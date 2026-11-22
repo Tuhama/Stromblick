@@ -191,3 +191,61 @@ describe("GenerationToday", () => {
     expect(screen.queryByText("The share couldn't be calculated.")).not.toBeInTheDocument();
   });
 });
+
+describe("an empty day with older data", () => {
+  /** /status knows a newest generation hour; every readings request has no points. */
+  function stubOlderData() {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>((input) => {
+        const url =
+          typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+        return Promise.resolve(
+          Response.json(
+            url.endsWith("/status")
+              ? {
+                  lastSuccessAt: "2026-11-21T13:15:35.000Z",
+                  lastRun: { status: "SUCCEEDED", finishedAt: "2026-11-21T13:15:35.000Z" },
+                  latestReadings: {
+                    "generation-solar": "2026-11-19T14:00:00.000Z",
+                    "generation-wind-onshore": "2026-11-19T14:00:00.000Z",
+                  },
+                }
+              : { series: "x", region: "DE", resolution: "hour", unit: "MWh", points: [] },
+          ),
+        );
+      }),
+    );
+  }
+
+  it("tells the share and the chart how far the data reaches", async () => {
+    stubOlderData();
+    renderWithClient(
+      <>
+        <RenewableShare />
+        <GenerationToday />
+      </>,
+    );
+    expect(
+      await screen.findByText(
+        "Not available for today. The newest figures run up to Nov 19, 2026, 15:00 CET.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        "Today's generation figures aren't available. The newest we have run up to Nov 19, 2026, 15:00 CET.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("says it in German for a German reader", async () => {
+    await i18n.changeLanguage("de");
+    stubOlderData();
+    renderWithClient(<RenewableShare />);
+    expect(
+      await screen.findByText(
+        "Für heute nicht verfügbar. Die neuesten Werte reichen bis 19.11.2026, 15:00 MEZ.",
+      ),
+    ).toBeInTheDocument();
+  });
+});

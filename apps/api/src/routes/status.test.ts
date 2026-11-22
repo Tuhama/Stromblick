@@ -21,6 +21,7 @@ describe("GET /status", () => {
     const status: StatusResponse = {
       lastSuccessAt: "2026-11-10T19:00:05.000Z",
       lastRun: { status: "FAILED", finishedAt: "2026-11-10T20:00:02.000Z" },
+      latestReadings: { "price-day-ahead": "2026-11-22T22:45:00.000Z", load: null },
     };
     const res = await request(appWithStatus(() => Promise.resolve(status))).get("/status");
 
@@ -30,11 +31,13 @@ describe("GET /status", () => {
   });
 
   it("returns nulls before the first ingest", async () => {
-    const app = appWithStatus(() => Promise.resolve({ lastSuccessAt: null, lastRun: null }));
+    const app = appWithStatus(() =>
+      Promise.resolve({ lastSuccessAt: null, lastRun: null, latestReadings: {} }),
+    );
     const res = await request(app).get("/status");
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ lastSuccessAt: null, lastRun: null });
+    expect(res.body).toEqual({ lastSuccessAt: null, lastRun: null, latestReadings: {} });
   });
 
   it("answers with problem details, uncached, when the database fails", async () => {

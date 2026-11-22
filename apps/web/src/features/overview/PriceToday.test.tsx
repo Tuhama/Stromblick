@@ -174,6 +174,36 @@ describe("PriceToday", () => {
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });
 
+  it("says how far the data reaches when today has no prices", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>((input) => {
+        const url =
+          typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+        // The 20th and 21st are missing at SMARD; the newest price is for the 22nd.
+        return Promise.resolve(
+          Response.json(
+            url.endsWith("/status")
+              ? {
+                  lastSuccessAt: "2026-11-21T13:15:35.000Z",
+                  lastRun: { status: "SUCCEEDED", finishedAt: "2026-11-21T13:15:35.000Z" },
+                  latestReadings: { "price-day-ahead": "2026-11-22T22:45:00.000Z" },
+                }
+              : { ...READINGS, points: [] },
+          ),
+        );
+      }),
+    );
+    renderPriceToday();
+
+    expect(
+      await screen.findByText(
+        "Today's prices aren't available. The newest prices we have run up to Nov 22, 2026, 23:45 CET.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  });
+
   it("says so when the prices can't be loaded", async () => {
     stubFetch({ type: "about:blank", title: "Internal Server Error", status: 500 }, 500);
     renderPriceToday();

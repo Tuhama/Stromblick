@@ -2,6 +2,7 @@ import type { Point } from "@stromblick/shared";
 import type { ChartColors } from "../../charts/chart-colors";
 import type { DataTableRow } from "../../charts/DataTable";
 import { downsample, MAX_CHART_POINTS } from "../../charts/downsample";
+import { breakAtGaps } from "../../charts/gaps";
 import type { ChartOption } from "../../charts/echarts";
 import { timeAxis } from "../../charts/time-axis";
 import { readPoint } from "../../charts/tooltip";
@@ -148,7 +149,8 @@ export function generationOption({
         lineStyle: { color: colors.background, width: 2 },
         areaStyle: { color, opacity: 1 },
         itemStyle: { color },
-        data: (drawn[index] ?? []).map(([time, value]) => [time, value]),
+        // Every layer shares the same times, so all layers stop at the same hole.
+        data: breakAtGaps(drawn[index] ?? []),
       };
     }),
   };

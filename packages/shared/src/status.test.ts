@@ -29,4 +29,36 @@ describe("StatusResponse", () => {
       StatusResponse.parse({ lastSuccessAt: "10.11.2026 20:00", lastRun: null }),
     ).toThrow();
   });
+  it("accepts the newest reading of each series, and null for one without readings", () => {
+    const status = StatusResponse.parse({
+      lastSuccessAt: null,
+      lastRun: null,
+      latestReadings: { "price-day-ahead": "2026-11-22T22:45:00.000Z", load: null },
+    });
+    expect(status.latestReadings).toEqual({
+      "price-day-ahead": "2026-11-22T22:45:00.000Z",
+      load: null,
+    });
+  });
+
+  it("reads an answer without latestReadings (an older API) as no information", () => {
+    expect(StatusResponse.parse({ lastSuccessAt: null, lastRun: null }).latestReadings).toEqual({});
+  });
+
+  it("rejects a newest reading that isn't ISO 8601 in UTC, and a key that isn't a series key", () => {
+    expect(() =>
+      StatusResponse.parse({
+        lastSuccessAt: null,
+        lastRun: null,
+        latestReadings: { load: "22.11.2026" },
+      }),
+    ).toThrow();
+    expect(() =>
+      StatusResponse.parse({
+        lastSuccessAt: null,
+        lastRun: null,
+        latestReadings: { "Not A Key": null },
+      }),
+    ).toThrow();
+  });
 });

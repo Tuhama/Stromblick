@@ -36,6 +36,7 @@
       "note": "Großhandelspreis, ohne Steuern, Umlagen und Netzentgelte. Alle Uhrzeiten in deutscher Zeit ({{zone}}).",
       "error": "Die Preise konnten nicht geladen werden.",
       "empty": "Die heutigen Preise liegen noch nicht vor.",
+      "emptyNewest": "Die heutigen Preise liegen nicht vor. Die neuesten vorhandenen Preise reichen bis {{time}}.",
       "low": "Niedrigster",
       "high": "Höchster",
       "average": "Durchschnitt",
@@ -47,6 +48,7 @@
     "generation": {
       "error": "Die Erzeugungsdaten konnten nicht geladen werden.",
       "empty": "Die Erzeugungsdaten für heute liegen noch nicht vor.",
+      "emptyNewest": "Die Erzeugungsdaten für heute liegen nicht vor. Die neuesten vorhandenen Daten reichen bis {{time}}.",
       "note": "Energie pro Stunde in MWh, nur vollständige Stunden. Die Zeiten sind in deutscher Zeit ({{zone}}).",
       "tableCaption": "Stromerzeugung heute nach Quelle, in MWh pro Stunde, in deutscher Zeit ({{zone}})",
       "total": "Gesamt"
@@ -55,7 +57,13 @@
       "title": "Erneuerbarer Anteil heute",
       "note": "Solar, Wind, Biomasse, Wasserkraft und sonstige Erneuerbare als Anteil an der gesamten bisher heute in Deutschland erzeugten Strommenge. Pumpspeicher zählen nicht als erneuerbar.",
       "error": "Der Anteil konnte nicht berechnet werden.",
-      "empty": "Heute noch nicht verfügbar."
+      "empty": "Heute noch nicht verfügbar.",
+      "emptyNewest": "Für heute nicht verfügbar. Die neuesten Werte reichen bis {{time}}."
+    },
+    "newest": {
+      "line": "Neueste Daten: {{items}}.",
+      "prices": "Preise bis {{time}}",
+      "generation": "Erzeugung bis {{time}}"
     },
     "outdated": "Die Daten sind nicht aktuell: Die letzte erfolgreiche Aktualisierung war {{ago}}. Die Diagramme zeigen die neuesten Daten, die wir haben."
   },

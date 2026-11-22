@@ -6,7 +6,7 @@ import {
 } from "@stromblick/shared";
 import { HttpError } from "../errors";
 import { LlmError, type ChatMessage, type LlmClient, type ToolCall } from "./llm-client";
-import { SYSTEM_PROMPT } from "./system-prompt";
+import { buildSystemPrompt } from "./system-prompt";
 import type { AssistantTool } from "./tools";
 
 export interface AssistantLimits {
@@ -54,6 +54,8 @@ export interface AssistantRun {
   history?: Turn[];
   limits?: AssistantLimits;
   signal?: AbortSignal;
+  /** The clock; tests set it so that "today" is fixed. */
+  now?: () => Date;
 }
 
 function tooLong(what: string, max: number): HttpError {
@@ -155,6 +157,7 @@ export async function* runAssistant({
   history = [],
   limits = DEFAULT_LIMITS,
   signal,
+  now = () => new Date(),
 }: AssistantRun): AsyncGenerator<AssistantEvent> {
   const { question: trimmed, history: recent } = prepareConversation(question, history, limits);
 
@@ -167,6 +170,7 @@ export async function* runAssistant({
     { role: "user", text: trimmed },
   ];
   const specs = tools.map((tool) => tool.spec);
+  const system = buildSystemPrompt(now());
   let used = 0;
   let truncated = false;
   let lastText = "";
@@ -180,7 +184,7 @@ export async function* runAssistant({
     truncated = false;
 
     for await (const event of llm.stream({
-      system: SYSTEM_PROMPT,
+      system,
       messages,
       tools: used < limits.maxToolCalls ? specs : [],
       maxOutputTokens: limits.maxOutputTokens,

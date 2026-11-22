@@ -7,8 +7,10 @@ import { ChartPanel, type ChartStatus } from "../../charts/ChartPanel";
 import { DataTable } from "../../charts/DataTable";
 import { currentLanguage } from "../../i18n";
 import { berlinZoneName, formatClock, todayInBerlin } from "../../time/berlin";
+import { formatMoment } from "./newest-data";
 import { formatPrice, summarizePrices, type PriceSummary } from "./price";
 import { convertPrice, PRICE_UNITS, usePriceUnit } from "./price-unit";
+import { useNewestData } from "./use-newest-data";
 
 // Its own chunk: ECharts is downloaded after the page is on screen, not before.
 const PriceChart = lazy(() => import("./PriceChart"));
@@ -30,6 +32,7 @@ export function PriceToday() {
   );
 
   const language = currentLanguage();
+  const newest = useNewestData();
   const summary = points && summarizePrices(points);
   let status: ChartStatus = "ready";
   if (readings.isPending) status = "loading";
@@ -69,7 +72,11 @@ export function PriceToday() {
           messages={{
             loading: t("overview.loading"),
             error: tooManyRequestsMessage(t, readings.error) ?? t("overview.price.error"),
-            empty: t("overview.price.empty"),
+            // Without prices for today, say how far the data does reach.
+            empty:
+              newest.prices === null
+                ? t("overview.price.empty")
+                : t("overview.price.emptyNewest", { time: formatMoment(newest.prices, language) }),
           }}
           refreshFailed={readings.isRefetchError}
           onRetry={() => void readings.refetch()}

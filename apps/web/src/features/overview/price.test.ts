@@ -55,6 +55,38 @@ describe("priceOption", () => {
     ]);
   });
 
+  it("stops the line at a hole in the data instead of holding the price across it", () => {
+    const start = Date.parse("2026-11-19T00:00:00Z");
+    const at = (minutes: number) => start + minutes * 60_000;
+    // Three quarter hours, nothing for 90 minutes, then two more.
+    const withHole: Point[] = [
+      [at(0), 80],
+      [at(15), 70],
+      [at(30), 60],
+      [at(120), 50],
+      [at(135), 40],
+    ];
+    const gapped = priceOption({
+      points: withHole,
+      unit: "EUR/MWh",
+      language: "en",
+      colors,
+      animate: false,
+    });
+    expect(gapped.series).toEqual([
+      expect.objectContaining({
+        data: [
+          [at(0), 80],
+          [at(15), 70],
+          [at(30), 60],
+          [at(45), null],
+          [at(120), 50],
+          [at(135), 40],
+        ],
+      }),
+    ]);
+  });
+
   it("takes its colors from the theme", () => {
     expect(option.series).toEqual([
       expect.objectContaining({ lineStyle: { color: "#0b1f2a", width: 2 } }),

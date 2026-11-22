@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { Point } from "@stromblick/shared";
 import { DAY_AHEAD_PRICE_KEY } from "@stromblick/shared";
 import { HttpError } from "../errors";
+import type { LoadLatest } from "../series/load-latest";
 import type { LoadReadings } from "../series/load-readings";
 import { SMARD_SERIES } from "../smard/catalog";
 import { createTools, MAX_LISTED_POINTS, type AssistantTool } from "./tools";
@@ -12,21 +13,23 @@ const generationKey = SMARD_SERIES.find((series) => series.kind === "generation"
 const MIDNIGHT = Date.UTC(2026, 10, 17);
 const HOUR = 3_600_000;
 
-function setup(points: Point[] = []) {
+function setup(points: Point[] = [], newest: number | null = null) {
   const readings = vi.fn<LoadReadings>(() => Promise.resolve(points));
+  const latest = vi.fn<LoadLatest>(() => Promise.resolve(newest));
   const status = vi.fn(() =>
     Promise.resolve({
       lastSuccessAt: "2026-11-17T10:00:00.000Z",
       lastRun: { status: "SUCCEEDED" as const, finishedAt: "2026-11-17T10:00:00.000Z" },
+      latestReadings: { "price-day-ahead": "2026-11-22T22:45:00.000Z", load: null },
     }),
   );
-  const tools = createTools({ readings, status });
+  const tools = createTools({ readings, latest, status });
   const tool = (name: string): AssistantTool => {
     const found = tools.find((candidate) => candidate.spec.name === name);
     if (!found) throw new Error(`No tool ${name}`);
     return found;
   };
-  return { tool, readings, status };
+  return { tool, readings, latest, status };
 }
 
 describe("tool specs", () => {
@@ -119,6 +122,36 @@ describe("get_readings", () => {
     expect(result).toMatchObject({ count: 0, summary: null, points: [] });
   });
 
+  it("names the newest reading in Berlin time when the range has no data", async () => {
+    // The price series has a hole on the 20th and 21st; the newest reading is the 22nd, 23:45 Berlin.
+    const newest = Date.parse("2026-11-22T22:45:00Z");
+    const { tool, latest } = setup([], newest);
+    const result = JSON.parse(
+      await tool("get_readings").run({ ...args, from: "2026-11-20", to: "2026-11-20" }),
+    ) as Record<string, unknown>;
+    expect(result.latestReading).toBe("2026-11-22 23:45");
+    expect(result.note).toBe(
+      "No readings in this range. The newest reading we have is at 2026-11-22 23:45.",
+    );
+    expect(latest).toHaveBeenCalledWith({ seriesId: 4169, region: "DE-LU", native: "quarterhour" });
+  });
+
+  it("says so when the series has no readings at all", async () => {
+    const result = JSON.parse(await setup([], null).tool("get_readings").run(args)) as Record<
+      string,
+      unknown
+    >;
+    expect(result.latestReading).toBeNull();
+    expect(result.note).toMatch(/no readings at all/);
+  });
+
+  it("does not look up the newest reading when the range has data", async () => {
+    const { tool, latest } = setup([[MIDNIGHT, 80]], Date.parse("2026-11-22T22:45:00Z"));
+    const result = JSON.parse(await tool("get_readings").run(args)) as Record<string, unknown>;
+    expect(result).not.toHaveProperty("latestReading");
+    expect(latest).not.toHaveBeenCalled();
+  });
+
   it("rejects bad arguments with a readable HttpError and never reads the database", async () => {
     const { tool, readings } = setup();
     const run = tool("get_readings").run;
@@ -138,6 +171,8 @@ describe("get_status", () => {
       timeZone: "Europe/Berlin",
       lastSuccessAt: "2026-11-17 11:00",
       lastRun: { status: "SUCCEEDED", finishedAt: "2026-11-17 11:00" },
+      // A series with no readings stays null; the others are in Berlin time too.
+      latestReadings: { "price-day-ahead": "2026-11-22 23:45", load: null },
     });
   });
 
@@ -146,8 +181,13 @@ describe("get_status", () => {
       Promise.resolve({
         lastSuccessAt: "2026-07-01T10:00:00.000Z",
         lastRun: null,
+        latestReadings: {},
       });
-    const tools = createTools({ readings: () => Promise.resolve([]), status });
+    const tools = createTools({
+      readings: () => Promise.resolve([]),
+      latest: () => Promise.resolve(null),
+      status,
+    });
     const run = tools.find((t) => t.spec.name === "get_status")?.run;
     const result = JSON.parse((await run?.({})) ?? "{}") as Record<string, unknown>;
     expect(result.lastSuccessAt).toBe("2026-07-01 12:00");
@@ -155,8 +195,13 @@ describe("get_status", () => {
   });
 
   it("keeps null before the first ingest", async () => {
-    const status = () => Promise.resolve({ lastSuccessAt: null, lastRun: null });
-    const tools = createTools({ readings: () => Promise.resolve([]), status });
+    const status = () =>
+      Promise.resolve({ lastSuccessAt: null, lastRun: null, latestReadings: {} });
+    const tools = createTools({
+      readings: () => Promise.resolve([]),
+      latest: () => Promise.resolve(null),
+      status,
+    });
     const run = tools.find((t) => t.spec.name === "get_status")?.run;
     const result = JSON.parse((await run?.({})) ?? "{}") as Record<string, unknown>;
     expect(result.lastSuccessAt).toBeNull();

@@ -36,6 +36,7 @@
       "note": "Wholesale price, without taxes, levies and grid fees. Times are in German time ({{zone}}).",
       "error": "The prices couldn't be loaded.",
       "empty": "Today's prices aren't available yet.",
+      "emptyNewest": "Today's prices aren't available. The newest prices we have run up to {{time}}.",
       "low": "Lowest",
       "high": "Highest",
       "average": "Average",
@@ -47,6 +48,7 @@
     "generation": {
       "error": "The generation figures couldn't be loaded.",
       "empty": "Today's generation figures aren't available yet.",
+      "emptyNewest": "Today's generation figures aren't available. The newest we have run up to {{time}}.",
       "note": "Energy per hour in MWh, for complete hours only. Times are in German time ({{zone}}).",
       "tableCaption": "Electricity generation today by source, in MWh per hour, in German time ({{zone}})",
       "total": "Total"
@@ -55,7 +57,13 @@
       "title": "Renewable share today",
       "note": "Solar, wind, biomass, hydropower and other renewables as a share of all electricity generated in Germany so far today. Pumped storage doesn't count as renewable.",
       "error": "The share couldn't be calculated.",
-      "empty": "Not available yet today."
+      "empty": "Not available yet today.",
+      "emptyNewest": "Not available for today. The newest figures run up to {{time}}."
+    },
+    "newest": {
+      "line": "Newest data: {{items}}.",
+      "prices": "prices up to {{time}}",
+      "generation": "generation up to {{time}}"
     },
     "outdated": "The data is out of date: the last successful update was {{ago}}. The charts show the latest data we have."
   },
