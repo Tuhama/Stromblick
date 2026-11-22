@@ -57,6 +57,11 @@
       "error": "Der Anteil konnte nicht berechnet werden.",
       "empty": "Heute noch nicht verfügbar."
     },
+    "newest": {
+      "line": "Neueste Daten: {{items}}.",
+      "prices": "Preise bis {{time}}",
+      "generation": "Erzeugung bis {{time}}"
+    },
     "outdated": "Die Daten sind nicht aktuell: Die letzte erfolgreiche Aktualisierung war {{ago}}. Die Diagramme zeigen die neuesten Daten, die wir haben."
   },
   "tomorrow": {

@@ -57,6 +57,11 @@
       "error": "The share couldn't be calculated.",
       "empty": "Not available yet today."
     },
+    "newest": {
+      "line": "Newest data: {{items}}.",
+      "prices": "prices up to {{time}}",
+      "generation": "generation up to {{time}}"
+    },
     "outdated": "The data is out of date: the last successful update was {{ago}}. The charts show the latest data we have."
   },
   "tomorrow": {

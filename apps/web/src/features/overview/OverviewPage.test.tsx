@@ -1,4 +1,5 @@
 import { screen } from "@testing-library/react";
+import i18n from "i18next";
 import { describe, expect, it, vi } from "vitest";
 import type { StatusResponse } from "@stromblick/shared";
 import { HOUR, MINUTE } from "../../time/units";
@@ -21,7 +22,11 @@ function stubStatus(status: StatusResponse | number) {
 
 function succeededAgo(milliseconds: number): StatusResponse {
   const at = new Date(Date.now() - milliseconds).toISOString();
-  return { lastSuccessAt: at, lastRun: { status: "SUCCEEDED", finishedAt: at } };
+  return {
+    lastSuccessAt: at,
+    lastRun: { status: "SUCCEEDED", finishedAt: at },
+    latestReadings: {},
+  };
 }
 
 describe("overview data freshness", () => {
@@ -54,5 +59,40 @@ describe("overview data freshness", () => {
     stubStatus(503);
     renderApp("/");
     expect(await screen.findByText("The API is not reachable right now.")).toBeInTheDocument();
+  });
+});
+
+describe("overview newest data", () => {
+  it("says how new the prices and the generation figures are, in German time", async () => {
+    renderApp("/");
+    expect(await screen.findByText(/^Newest data:/)).toHaveTextContent(
+      "Newest data: prices up to Nov 11, 2026, 23:45 CET and generation up to Nov 10, 2026, 15:00 CET.",
+    );
+  });
+
+  it("names only what it knows", async () => {
+    stubStatus({
+      ...succeededAgo(20 * MINUTE),
+      latestReadings: { "price-day-ahead": "2026-11-19T22:45:00.000Z" },
+    });
+    renderApp("/");
+    expect(await screen.findByText(/^Newest data:/)).toHaveTextContent(
+      "Newest data: prices up to Nov 19, 2026, 23:45 CET.",
+    );
+  });
+
+  it("shows no line when the API knows no newest readings", async () => {
+    stubStatus(succeededAgo(20 * MINUTE));
+    renderApp("/");
+    expect(await screen.findByText("Data updated 20 minutes ago")).toBeInTheDocument();
+    expect(screen.queryByText(/^Newest data:/)).not.toBeInTheDocument();
+  });
+
+  it("is written in German for a German reader", async () => {
+    await i18n.changeLanguage("de");
+    renderApp("/");
+    expect(await screen.findByText(/^Neueste Daten:/)).toHaveTextContent(
+      "Neueste Daten: Preise bis 11.11.2026, 23:45 MEZ und Erzeugung bis 10.11.2026, 15:00 MEZ.",
+    );
   });
 });

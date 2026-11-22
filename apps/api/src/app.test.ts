@@ -18,7 +18,7 @@ const ingest = {
 // GET /series and its readings have their own tests in routes/series.test.ts.
 const readings = () => Promise.resolve([]);
 // GET /status has its own tests in routes/status.test.ts.
-const status = () => Promise.resolve({ lastSuccessAt: null, lastRun: null });
+const status = () => Promise.resolve({ lastSuccessAt: null, lastRun: null, latestReadings: {} });
 
 const app = createApp({
   logger,

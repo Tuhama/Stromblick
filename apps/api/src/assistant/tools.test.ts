@@ -20,6 +20,7 @@ function setup(points: Point[] = [], newest: number | null = null) {
     Promise.resolve({
       lastSuccessAt: "2026-11-17T10:00:00.000Z",
       lastRun: { status: "SUCCEEDED" as const, finishedAt: "2026-11-17T10:00:00.000Z" },
+      latestReadings: { "price-day-ahead": "2026-11-22T22:45:00.000Z", load: null },
     }),
   );
   const tools = createTools({ readings, latest, status });
@@ -170,6 +171,8 @@ describe("get_status", () => {
       timeZone: "Europe/Berlin",
       lastSuccessAt: "2026-11-17 11:00",
       lastRun: { status: "SUCCEEDED", finishedAt: "2026-11-17 11:00" },
+      // A series with no readings stays null; the others are in Berlin time too.
+      latestReadings: { "price-day-ahead": "2026-11-22 23:45", load: null },
     });
   });
 
@@ -178,11 +181,12 @@ describe("get_status", () => {
       Promise.resolve({
         lastSuccessAt: "2026-07-01T10:00:00.000Z",
         lastRun: null,
+        latestReadings: {},
       });
     const tools = createTools({
       readings: () => Promise.resolve([]),
-      status,
       latest: () => Promise.resolve(null),
+      status,
     });
     const run = tools.find((t) => t.spec.name === "get_status")?.run;
     const result = JSON.parse((await run?.({})) ?? "{}") as Record<string, unknown>;
@@ -191,11 +195,12 @@ describe("get_status", () => {
   });
 
   it("keeps null before the first ingest", async () => {
-    const status = () => Promise.resolve({ lastSuccessAt: null, lastRun: null });
+    const status = () =>
+      Promise.resolve({ lastSuccessAt: null, lastRun: null, latestReadings: {} });
     const tools = createTools({
       readings: () => Promise.resolve([]),
-      status,
       latest: () => Promise.resolve(null),
+      status,
     });
     const run = tools.find((t) => t.spec.name === "get_status")?.run;
     const result = JSON.parse((await run?.({})) ?? "{}") as Record<string, unknown>;

@@ -11,7 +11,7 @@ function makeApp(rateLimitPerMinute: number) {
     checkDatabase: () => Promise.resolve(),
     ingest: { secret: "x".repeat(32), run: () => Promise.reject(new Error("not used")) },
     readings: () => Promise.resolve([]),
-    status: () => Promise.resolve({ lastSuccessAt: null, lastRun: null }),
+    status: () => Promise.resolve({ lastSuccessAt: null, lastRun: null, latestReadings: {} }),
     rateLimitPerMinute,
   });
 }

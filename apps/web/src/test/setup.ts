@@ -41,6 +41,12 @@ beforeEach(async () => {
   const status: StatusResponse = {
     lastSuccessAt: updated,
     lastRun: { status: "SUCCEEDED", finishedAt: updated },
+    // Prices are published for tomorrow; generation reaches into today. Fixed, so texts are stable.
+    latestReadings: {
+      "price-day-ahead": "2026-11-11T22:45:00.000Z",
+      "generation-solar": "2026-11-10T15:00:00.000Z",
+      "generation-wind-onshore": "2026-11-10T14:00:00.000Z",
+    },
   };
   const readings: ReadingsResponse = {
     series: DAY_AHEAD_PRICE_KEY,

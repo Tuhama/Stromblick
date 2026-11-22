@@ -31,7 +31,7 @@ function appWith(
     checkDatabase: () => Promise.resolve(),
     ingest: { secret: "x".repeat(32), run: () => Promise.reject(new Error("not used")) },
     readings: () => Promise.resolve([]),
-    status: () => Promise.resolve({ lastSuccessAt: null, lastRun: null }),
+    status: () => Promise.resolve({ lastSuccessAt: null, lastRun: null, latestReadings: {} }),
     assistant: {
       llm,
       tools: [tool],
@@ -99,7 +99,7 @@ describe("POST /assistant", () => {
       checkDatabase: () => Promise.resolve(),
       ingest: { secret: "x".repeat(32), run: () => Promise.reject(new Error("not used")) },
       readings: () => Promise.resolve([]),
-      status: () => Promise.resolve({ lastSuccessAt: null, lastRun: null }),
+      status: () => Promise.resolve({ lastSuccessAt: null, lastRun: null, latestReadings: {} }),
     });
     const res = await request(app).post("/assistant").send({ question: "Hi" });
     expect(res.status).toBe(503);

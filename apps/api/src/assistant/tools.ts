@@ -158,16 +158,23 @@ export function createTools({ readings, latest, status }: ToolDeps): AssistantTo
     {
       spec: specFor(
         "get_status",
-        "Tells when the data was last updated and whether the latest update succeeded. " +
+        "Tells when the data was last updated, whether the latest update succeeded, and the newest reading of each series. " +
           "Times are Europe/Berlin local time.",
         NoArgs,
       ),
       run: async (args) => {
         parseArgs(NoArgs, args);
-        const { lastSuccessAt, lastRun } = StatusResponse.parse(await status());
+        const { lastSuccessAt, lastRun, latestReadings } = StatusResponse.parse(await status());
         return JSON.stringify({
           timeZone: MARKET_TIME_ZONE,
           lastSuccessAt: lastSuccessAt && formatTime(Date.parse(lastSuccessAt)),
+          // The newest reading of every series; a day can be missing before it.
+          latestReadings: Object.fromEntries(
+            Object.entries(latestReadings).map(([key, time]) => [
+              key,
+              time && formatTime(Date.parse(time)),
+            ]),
+          ),
           lastRun: lastRun && {
             status: lastRun.status,
             finishedAt: formatTime(Date.parse(lastRun.finishedAt)),
