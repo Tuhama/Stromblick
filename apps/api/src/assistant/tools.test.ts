@@ -136,6 +136,72 @@ describe("get_readings", () => {
     expect(latest).toHaveBeenCalledWith({ seriesId: 4169, region: "DE-LU", native: "quarterhour" });
   });
 
+  describe("days without readings", () => {
+    // The 16th to 19th and the 22nd have readings; the 20th and 21st have none (a hole at SMARD).
+    const weekWithHole = ["2026-11-16", "2026-11-17", "2026-11-18", "2026-11-19", "2026-11-22"].map(
+      (day): [number, number] => [Date.parse(`${day}T11:00:00Z`), 100],
+    );
+    const week = { ...args, from: "2026-11-16", to: "2026-11-22" };
+
+    it("names the days of the range that have no readings, and says the summary leaves them out", async () => {
+      const result = JSON.parse(await setup(weekWithHole).tool("get_readings").run(week)) as Record<
+        string,
+        unknown
+      >;
+      expect(result.daysWithoutData).toEqual(["2026-11-20", "2026-11-21"]);
+      expect(result).not.toHaveProperty("moreDaysWithoutData");
+      expect(result.note).toBe(
+        "The summary covers only the days with readings. No readings on: 2026-11-20, 2026-11-21.",
+      );
+    });
+
+    it("says nothing about days when every day has readings", async () => {
+      const full = weekWithHole.concat([
+        [Date.parse("2026-11-20T11:00:00Z"), 100],
+        [Date.parse("2026-11-21T11:00:00Z"), 100],
+      ]);
+      const result = JSON.parse(await setup(full).tool("get_readings").run(week)) as Record<
+        string,
+        unknown
+      >;
+      expect(result).not.toHaveProperty("daysWithoutData");
+      expect(result.note).toBeUndefined();
+    });
+
+    it("counts the days beyond the 31 it lists", async () => {
+      const result = JSON.parse(
+        await setup([[Date.parse("2026-01-01T11:00:00Z"), 1]])
+          .tool("get_readings")
+          .run({ ...args, from: "2026-01-01", to: "2026-02-20", resolution: "day" }),
+      ) as Record<string, unknown>;
+      expect((result.daysWithoutData as string[]).length).toBe(31);
+      expect(result.moreDaysWithoutData).toBe(19);
+      expect(result.note).toMatch(/and 19 more days\.$/);
+    });
+
+    it("leaves the day list out when the whole range is empty; the newest reading says it", async () => {
+      const result = JSON.parse(await setup([], null).tool("get_readings").run(week)) as Record<
+        string,
+        unknown
+      >;
+      expect(result).not.toHaveProperty("daysWithoutData");
+    });
+
+    it("keeps the note about too many points next to the note about days", async () => {
+      const many = Array.from({ length: 201 }, (_, index): [number, number] => [
+        Date.parse("2026-11-16T00:00:00Z") + index * 900_000,
+        1,
+      ]);
+      const result = JSON.parse(
+        await setup(many)
+          .tool("get_readings")
+          .run({ ...args, from: "2026-11-16", to: "2026-11-20" }),
+      ) as Record<string, unknown>;
+      expect(result.note).toMatch(/^Too many points to list \(201\)/);
+      expect(result.note).toMatch(/No readings on: 2026-11-19, 2026-11-20\.$/);
+    });
+  });
+
   it("says so when the series has no readings at all", async () => {
     const result = JSON.parse(await setup([], null).tool("get_readings").run(args)) as Record<
       string,

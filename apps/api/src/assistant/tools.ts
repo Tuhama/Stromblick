@@ -14,6 +14,7 @@ import { queryReadings } from "../series/query-readings";
 import { SMARD_SERIES } from "../smard/catalog";
 import type { LoadStatus } from "../status/load-status";
 import type { ToolSpec } from "./llm-client";
+import { daysWithoutData, type DaysWithoutData } from "./missing-days";
 
 /** More points than this are summarised instead of listed: the answer must stay small for the model. */
 export const MAX_LISTED_POINTS = 200;
@@ -67,15 +68,28 @@ async function latestOf(latest: LoadLatest, key: string): Promise<string | null>
   return time === null ? null : formatTime(time);
 }
 
-function noteFor(count: number, listed: boolean, latestReading: string | null | undefined) {
+function noteFor(
+  count: number,
+  listed: boolean,
+  latestReading: string | null | undefined,
+  missing: DaysWithoutData | null,
+) {
   if (count === 0) {
     return latestReading
       ? `No readings in this range. The newest reading we have is at ${latestReading}.`
       : "No readings in this range, and the series has no readings at all.";
   }
-  return listed
-    ? undefined
-    : `Too many points to list (${count}). Use a shorter range or resolution "day".`;
+  const notes: string[] = [];
+  if (!listed) {
+    notes.push(`Too many points to list (${count}). Use a shorter range or resolution "day".`);
+  }
+  if (missing && missing.days.length > 0) {
+    const more = missing.more > 0 ? ` and ${missing.more} more days` : "";
+    notes.push(
+      `The summary covers only the days with readings. No readings on: ${missing.days.join(", ")}${more}.`,
+    );
+  }
+  return notes.length > 0 ? notes.join(" ") : undefined;
 }
 
 const NoArgs = z.object({});
@@ -128,7 +142,8 @@ export function createTools({ readings, latest, status }: ToolDeps): AssistantTo
         "get_readings",
         "Reads one series between two days (Europe/Berlin calendar days, both included, at most 366 days). " +
           "Returns min, max, average and total of the range, and the points when there are at most " +
-          `${MAX_LISTED_POINTS}. Times are Europe/Berlin local time.`,
+          `${MAX_LISTED_POINTS}. Lists the days of the range that have no readings at all. ` +
+          "Times are Europe/Berlin local time.",
         ReadingsArgs,
       ),
       run: async (args) => {
@@ -138,6 +153,9 @@ export function createTools({ readings, latest, status }: ToolDeps): AssistantTo
         const latestReading =
           result.points.length === 0 ? await latestOf(latest, series) : undefined;
         const listed = result.points.length <= MAX_LISTED_POINTS;
+        // Days with no reading at all: an average over the range does not include them.
+        const missing =
+          result.points.length > 0 ? daysWithoutData(query.from, query.to, result.points) : null;
         return JSON.stringify({
           series: result.series,
           unit: result.unit,
@@ -151,7 +169,9 @@ export function createTools({ readings, latest, status }: ToolDeps): AssistantTo
             : undefined,
           // Only when the range is empty: the newest reading the database holds for this series.
           latestReading,
-          note: noteFor(result.points.length, listed, latestReading),
+          daysWithoutData: missing && missing.days.length > 0 ? missing.days : undefined,
+          moreDaysWithoutData: missing && missing.more > 0 ? missing.more : undefined,
+          note: noteFor(result.points.length, listed, latestReading, missing),
         });
       },
     },

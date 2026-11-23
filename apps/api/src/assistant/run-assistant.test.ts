@@ -223,6 +223,15 @@ describe("user input is data", () => {
     expect(prompt).toMatch(/Never end without an answer/i);
   });
 
+  it("asks the model to name days without readings, the resolution, and not to guess the database", () => {
+    const prompt = buildSystemPrompt(NOW);
+    expect(prompt).toMatch(/name those days and say that the figures cover only the other days/);
+    expect(prompt).toMatch(/name that \(for example "lowest hourly average"\)/);
+    expect(prompt).toMatch(
+      /Never say what the database does or does not hold unless a tool told you/,
+    );
+  });
+
   it("asks for plain text and for the newest reading when there is no data", () => {
     const prompt = buildSystemPrompt(NOW);
     expect(prompt).toMatch(/plain text/i);
