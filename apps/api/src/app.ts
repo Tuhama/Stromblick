@@ -11,6 +11,7 @@ import { assistantRouter, type AssistantRouteOptions } from "./routes/assistant"
 import { ingestRouter, type IngestRouteOptions } from "./routes/ingest";
 import { seriesRouter } from "./routes/series";
 import { statusRouter } from "./routes/status";
+import { tomorrowRouter } from "./routes/tomorrow";
 import type { LoadReadings } from "./series/load-readings";
 import type { LoadStatus } from "./status/load-status";
 
@@ -33,6 +34,8 @@ export interface AppOptions {
   rateLimitPerMinute?: number;
   /** The AI assistant. Left out, POST /assistant answers 503. */
   assistant?: AssistantRouteOptions;
+  /** The clock; tests set it to a fixed moment. Defaults to the real time. */
+  now?: () => Date;
 }
 
 export function createApp({
@@ -44,6 +47,7 @@ export function createApp({
   status,
   rateLimitPerMinute = DEFAULT_RATE_LIMIT_PER_MINUTE,
   assistant,
+  now = () => new Date(),
 }: AppOptions) {
   const app = express();
 
@@ -91,6 +95,7 @@ export function createApp({
   app.use(rateLimiter(rateLimitPerMinute));
   app.use(seriesRouter(readings));
   app.use(statusRouter(status));
+  app.use(tomorrowRouter(readings, now));
   app.use(assistantRouter(assistant));
   app.use(notFound);
   app.use(errorHandler);
