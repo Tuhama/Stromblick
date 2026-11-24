@@ -194,7 +194,10 @@ function Explorer() {
                 ))}
               </dl>
               <p className="mt-4 text-sm text-muted-foreground">
-                {t("explorer.note", { resolution: resolutionText(resolution), zone })}
+                {t(isPrice ? "explorer.note" : "explorer.noteEnergy", {
+                  resolution: resolutionText(resolution),
+                  zone,
+                })}
               </p>
               <DataTable
                 caption={t("explorer.tableCaption", { series: seriesName, period, unit, zone })}

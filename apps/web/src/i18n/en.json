@@ -121,7 +121,7 @@
       "hour": "One value per hour.",
       "day": "One value per day."
     },
-    "note": "{{resolution}} Energy is in MWh per interval. Times are in German time ({{zone}}).",
+    "note": "{{resolution}} Times are in German time ({{zone}}).",
     "error": "The figures couldn't be loaded.",
     "empty": "We have no readings for this range. Try a later one.",
     "figures": {
@@ -131,7 +131,8 @@
     },
     "chartLabel": "Line chart of {{series}}, {{period}}, in {{unit}}. Lowest {{low}}, highest {{high}}.",
     "tableCaption": "{{series}}, {{period}}, in {{unit}}, in German time ({{zone}})",
-    "column": "{{unit}}"
+    "column": "{{unit}}",
+    "noteEnergy": "{{resolution}} Energy is in MWh per interval. Times are in German time ({{zone}})."
   },
   "explain": {
     "title": "Explain a day",

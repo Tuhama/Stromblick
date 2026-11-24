@@ -121,7 +121,7 @@
       "hour": "Ein Wert pro Stunde.",
       "day": "Ein Wert pro Tag."
     },
-    "note": "{{resolution}} Energie in MWh pro Intervall. Alle Uhrzeiten in deutscher Zeit ({{zone}}).",
+    "note": "{{resolution}} Alle Uhrzeiten in deutscher Zeit ({{zone}}).",
     "error": "Die Werte konnten nicht geladen werden.",
     "empty": "Für diesen Zeitraum liegen keine Messwerte vor. Ein späterer Zeitraum ist möglich.",
     "figures": {
@@ -131,7 +131,8 @@
     },
     "chartLabel": "Liniendiagramm: {{series}}, {{period}}, in {{unit}}. Niedrigster Wert {{low}}, höchster {{high}}.",
     "tableCaption": "{{series}}, {{period}}, in {{unit}}, in deutscher Zeit ({{zone}})",
-    "column": "{{unit}}"
+    "column": "{{unit}}",
+    "noteEnergy": "{{resolution}} Energie in MWh pro Intervall. Alle Uhrzeiten in deutscher Zeit ({{zone}})."
   },
   "explain": {
     "title": "Tag erklären",

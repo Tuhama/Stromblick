@@ -254,6 +254,15 @@ describe("Explorer page", () => {
     ).toBeInTheDocument();
   });
 
+  it("does not talk about energy under a price", async () => {
+    stubApi(answer);
+    renderApp("/explorer?series=price-day-ahead&range=week&end=2026-11-20");
+
+    expect(
+      await screen.findByText("One value per hour. Times are in German time (CET)."),
+    ).toBeInTheDocument();
+  });
+
   it("says so when the range has no readings", async () => {
     stubApi(() => Response.json({ ...SOLAR, points: [] }));
     renderApp("/explorer?series=generation-solar&range=week&end=2026-01-20");
