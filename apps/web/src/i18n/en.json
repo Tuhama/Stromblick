@@ -96,7 +96,42 @@
   },
   "explorer": {
     "title": "Explorer",
-    "intro": "Any series over any time range, shareable by link."
+    "intro": "Any series over any time range, shareable by link.",
+    "series": {
+      "label": "Series",
+      "kind": {
+        "price": "Price",
+        "load": "Load",
+        "generation": "Generation"
+      }
+    },
+    "range": {
+      "legend": "Time range",
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "year": "Year"
+    },
+    "earlier": "Earlier",
+    "later": "Later",
+    "end": "Last day",
+    "heading": "{{series}}, {{period}}",
+    "resolution": {
+      "quarterhour": "One value per quarter hour.",
+      "hour": "One value per hour.",
+      "day": "One value per day."
+    },
+    "note": "{{resolution}} Energy is in MWh per interval. Times are in German time ({{zone}}).",
+    "error": "The figures couldn't be loaded.",
+    "empty": "We have no readings for this range. Try a later one.",
+    "figures": {
+      "low": "Lowest",
+      "high": "Highest",
+      "average": "Average"
+    },
+    "chartLabel": "Line chart of {{series}}, {{period}}, in {{unit}}. Lowest {{low}}, highest {{high}}.",
+    "tableCaption": "{{series}}, {{period}}, in {{unit}}, in German time ({{zone}})",
+    "column": "{{unit}}"
   },
   "explain": {
     "title": "Explain a day",

@@ -41,6 +41,11 @@ export function formatDateTime(moment: Date | number, language: string): string 
   }).format(moment);
 }
 
+/** A moment as a Berlin calendar date with the year, in the reader's language: "Nov 14, 2026". */
+export function formatDate(moment: Date | number, language: string): string {
+  return berlinFormatter(language, { dateStyle: "medium" }).format(moment);
+}
+
 /** A moment as a Berlin clock time on the 24-hour clock, e.g. "18:15". */
 export function formatClock(moment: Date | number): string {
   return berlinFormatter("de-DE", { hour: "2-digit", minute: "2-digit" }).format(moment);

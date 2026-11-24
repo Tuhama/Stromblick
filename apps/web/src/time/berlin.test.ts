@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { berlinZoneName, formatClock, formatDateTime, todayInBerlin } from "./berlin";
+import { berlinZoneName, formatClock, formatDate, formatDateTime, todayInBerlin } from "./berlin";
 
 describe("todayInBerlin", () => {
   it("is already the next day in Berlin late in the UTC evening", () => {
@@ -24,6 +24,15 @@ describe("formatDateTime", () => {
     const moment = new Date("2026-11-10T19:00:05Z");
     expect(formatDateTime(moment, "de")).toBe("10.11.2026, 20:00");
     expect(formatDateTime(moment, "en")).toBe("Nov 10, 2026, 20:00");
+  });
+});
+
+describe("formatDate", () => {
+  it("writes the Berlin date, with the year, in the reader's language", () => {
+    // 23:30 UTC is already the next day in Berlin.
+    const moment = new Date("2026-11-10T23:30:00Z");
+    expect(formatDate(moment, "de")).toBe("11.11.2026");
+    expect(formatDate(moment, "en")).toBe("Nov 11, 2026");
   });
 });
 

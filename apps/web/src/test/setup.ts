@@ -29,6 +29,11 @@ vi.mock("../features/tomorrow/TomorrowChart", () => ({
     createElement("div", { role: "img", "aria-label": label }),
 }));
 
+vi.mock("../features/explorer/ExplorerChart", () => ({
+  default: ({ label }: { label: string }) =>
+    createElement("div", { role: "img", "aria-label": label }),
+}));
+
 vi.mock("../features/overview/GenerationChart", () => ({
   default: ({ layers }: { layers: { id: string }[] }) =>
     createElement("div", {
