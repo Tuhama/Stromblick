@@ -56,7 +56,8 @@ the browser word by word.
 - **The model only asks, our code runs.** The tools are read-only and their arguments are validated.
   Every answer is capped (tool calls, question and history size, output length).
 - **Cost is limited in layers.** There is a limit per visitor, one for the whole site, and a shared
-  budget of model calls per minute and per day. It runs on Gemini's free tier.
+  budget of model calls per minute and per day. It runs on a Google project with billing enabled, so
+  all use is a Paid Service (ADR 0011).
 - **The provider can change.** The API talks to the model through its own small interface, and
   Gemini is one adapter behind it.
 - **Streaming goes straight to the API.** In production the browser calls the API's own address
@@ -64,8 +65,8 @@ the browser word by word.
 
 The reasons are in [ADR 0007](docs/adr/0007-rate-limit-by-client-address-in-memory.md),
 [0008](docs/adr/0008-gemini-behind-a-neutral-llm-interface.md) and
-[0009](docs/adr/0009-stream-assistant-answers-directly-from-the-api.md). On the free tier Google
-may use prompts to improve its products, so the page says so next to the input.
+[0009](docs/adr/0009-stream-assistant-answers-directly-from-the-api.md). As a Paid Service,
+Google does not use prompts to improve its products, and the page says so next to the input.
 
 ## Run it locally
 

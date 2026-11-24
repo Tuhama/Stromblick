@@ -26,6 +26,19 @@ export const routes: RouteObject[] = [
             }),
           },
           { path: "explain", element: <ExplainPage /> },
+          {
+            // The legal texts are long and rarely read: they load with their page, not with the app.
+            path: "impressum",
+            lazy: async () => ({
+              Component: (await import("../features/legal/LegalPages")).ImprintPage,
+            }),
+          },
+          {
+            path: "datenschutz",
+            lazy: async () => ({
+              Component: (await import("../features/legal/LegalPages")).PrivacyPage,
+            }),
+          },
           { path: "*", element: <NotFoundPage /> },
         ],
       },
