@@ -14,3 +14,12 @@ catalog:
   prisma: ^7.10.1
   "@prisma/adapter-pg": ^7.10.1
   "@prisma/client": ^7.10.1
+# Fixes for Dependabot alerts on transitive packages (issue #129).
+# Remove an override when the package that pulls it in ships the fix.
+overrides:
+  # prisma 7.10.1 pins effect 3.20.0 (ReDoS in Schema.TemplateLiteral, fixed in 3.22.1).
+  "effect@3.20.0": "3.22.5"
+  # typescript-eslint and glob use minimatch 10 (globparts amplification, fixed in the 11 line).
+  "minimatch@10": "11.0.9"
+  # Storybook's docgen plugin uses glob 13 (AbortSignal bypass, fixed in 14.0.2).
+  "glob@13": "14.0.6"
