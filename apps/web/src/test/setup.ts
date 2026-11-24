@@ -24,6 +24,11 @@ vi.mock("../features/overview/PriceChart", () => ({
     createElement("div", { role: "img", "aria-label": label }),
 }));
 
+vi.mock("../features/tomorrow/TomorrowChart", () => ({
+  default: ({ label }: { label: string }) =>
+    createElement("div", { role: "img", "aria-label": label }),
+}));
+
 vi.mock("../features/overview/GenerationChart", () => ({
   default: ({ layers }: { layers: { id: string }[] }) =>
     createElement("div", {
@@ -59,6 +64,10 @@ beforeEach(async () => {
     "fetch",
     vi.fn<typeof fetch>((input) => {
       const url = input instanceof Request ? input.url : input.toString();
+      // Tomorrow's prices are not out yet, unless a test stubs fetch itself.
+      if (url.endsWith("/tomorrow")) {
+        return Promise.resolve(Response.json({ status: "not-published", day: "2026-11-11" }));
+      }
       if (!url.includes("/readings")) return Promise.resolve(Response.json(status));
       // Generation series: 100 MWh in each of two hours; the price series: one quarter hour.
       const key = /\/series\/([^/]+)\/readings/.exec(url)?.[1] ?? DAY_AHEAD_PRICE_KEY;
