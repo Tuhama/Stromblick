@@ -1,3 +1,4 @@
+import { DAY, HOUR } from "@stromblick/shared";
 import {
   berlinDay,
   berlinMonth,
@@ -5,7 +6,6 @@ import {
   formatDayLabel,
   formatMonthLabel,
 } from "../time/berlin";
-import { DAY, HOUR } from "../time/units";
 import type { ChartColors } from "./chart-colors";
 import type { ChartOption } from "./echarts";
 

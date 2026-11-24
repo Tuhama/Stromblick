@@ -1,6 +1,6 @@
+import { MINUTE } from "@stromblick/shared";
 import { describe, expect, it } from "vitest";
 import { formatTimeAgo } from "./relative";
-import { MINUTE } from "./units";
 
 const NOW = Date.parse("2026-11-14T10:00:00Z");
 

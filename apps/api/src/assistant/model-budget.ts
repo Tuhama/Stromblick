@@ -1,7 +1,5 @@
+import { DAY, MINUTE } from "@stromblick/shared";
 import { LlmError, type LlmClient, type LlmRequest } from "./llm-client";
-
-const MINUTE_MS = 60_000;
-const DAY_MS = 24 * 60 * MINUTE_MS;
 
 export type BudgetCheck = { ok: true } | { ok: false; retryAfterSeconds: number };
 
@@ -41,13 +39,13 @@ export function createModelBudget({
 
   function check(): BudgetCheck {
     const at = now();
-    times = times.filter((time) => time > at - DAY_MS);
+    times = times.filter((time) => time > at - DAY);
     if (times.length >= perDay) {
-      return { ok: false, retryAfterSeconds: waitFor(times, DAY_MS, at) };
+      return { ok: false, retryAfterSeconds: waitFor(times, DAY, at) };
     }
-    const lastMinute = times.filter((time) => time > at - MINUTE_MS);
+    const lastMinute = times.filter((time) => time > at - MINUTE);
     if (lastMinute.length >= perMinute) {
-      return { ok: false, retryAfterSeconds: waitFor(lastMinute, MINUTE_MS, at) };
+      return { ok: false, retryAfterSeconds: waitFor(lastMinute, MINUTE, at) };
     }
     return { ok: true };
   }

@@ -1,3 +1,4 @@
+import { DAY } from "@stromblick/shared";
 import type { Point } from "@stromblick/shared";
 import type { ChartColors } from "../../charts/chart-colors";
 import type { ChartOption } from "../../charts/echarts";
@@ -6,7 +7,6 @@ import { breakAtGaps } from "../../charts/gaps";
 import { timeAxis } from "../../charts/time-axis";
 import { readPoint } from "../../charts/tooltip";
 import { formatClock, formatDateTime } from "../../time/berlin";
-import { DAY } from "../../time/units";
 
 export interface PriceSummary {
   min: Point;

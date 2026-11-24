@@ -1,3 +1,4 @@
+import { DAY } from "@stromblick/shared";
 import type { Point } from "@stromblick/shared";
 import type { ChartColors } from "../../charts/chart-colors";
 import type { DataTableRow } from "../../charts/DataTable";
@@ -7,7 +8,6 @@ import type { ChartOption } from "../../charts/echarts";
 import { timeAxis } from "../../charts/time-axis";
 import { readPoint } from "../../charts/tooltip";
 import { formatClock, formatDateTime } from "../../time/berlin";
-import { DAY } from "../../time/units";
 
 /**
  * The 11 generation series of the API, folded into 8 groups: a chart can't keep more colors apart.

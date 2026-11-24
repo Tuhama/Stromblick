@@ -1,8 +1,8 @@
+import { HOUR, MINUTE } from "@stromblick/shared";
 import { screen } from "@testing-library/react";
 import i18n from "i18next";
 import { describe, expect, it, vi } from "vitest";
 import type { StatusResponse } from "@stromblick/shared";
-import { HOUR, MINUTE } from "../../time/units";
 import { renderApp } from "../../test/render";
 
 /** Answers /status with the given last success, and everything else as the default stub does. */

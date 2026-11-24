@@ -1,5 +1,5 @@
+import { HOUR } from "@stromblick/shared";
 import type { Point, PriceWindow } from "@stromblick/shared";
-import { HOUR } from "../time-units";
 import { SLOT_MS } from "./berlin-day";
 
 export interface CheapestAndDearest {

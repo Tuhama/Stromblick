@@ -1,6 +1,6 @@
+import { MINUTE } from "@stromblick/shared";
 import { describe, expect, it } from "vitest";
 import type { Point } from "@stromblick/shared";
-import { MINUTE } from "../time/units";
 import { downsample } from "./downsample";
 
 const START = Date.parse("2026-01-01T00:00:00Z");

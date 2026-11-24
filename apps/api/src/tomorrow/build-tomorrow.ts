@@ -1,12 +1,14 @@
 import {
+  berlinDay,
   DAY_AHEAD_PRICE_KEY,
+  nextDay,
   WINDOW_HOURS,
   type TomorrowResponse,
   type WindowsOfLength,
 } from "@stromblick/shared";
 import type { LoadReadings } from "../series/load-readings";
 import { queryReadings } from "../series/query-readings";
-import { berlinDay, nextDay, slotsInDay } from "./berlin-day";
+import { slotsInDay } from "./berlin-day";
 import { findWindows } from "./windows";
 
 /** Tomorrow's day-ahead prices and their cheapest and most expensive windows of 1 to 4 hours. */

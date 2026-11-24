@@ -1,5 +1,5 @@
+import { DAY, HOUR } from "@stromblick/shared";
 import { describe, expect, it } from "vitest";
-import { HOUR, DAY } from "../time/units";
 import { axisTicks, axisTier, tickLabel } from "./time-axis";
 
 // 13 November, 23:00 UTC is midnight in Berlin.

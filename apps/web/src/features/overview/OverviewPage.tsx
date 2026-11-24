@@ -1,3 +1,4 @@
+import { MINUTE } from "@stromblick/shared";
 import type { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import { useStatus } from "../../api/queries";
@@ -7,7 +8,6 @@ import { Notice } from "../../layout/Notice";
 import { Page } from "../../layout/Page";
 import { berlinZoneName, formatDateTime } from "../../time/berlin";
 import { formatTimeAgo } from "../../time/relative";
-import { MINUTE } from "../../time/units";
 import { useNow } from "../../time/use-now";
 import { isOutdated } from "./freshness";
 import { GenerationToday } from "./GenerationToday";

@@ -1,5 +1,5 @@
+import { DAY, HOUR, MINUTE } from "@stromblick/shared";
 import type { Point } from "@stromblick/shared";
-import { DAY, HOUR, MINUTE } from "../time/units";
 
 /**
  * The most points a chart draws per series: about one per pixel of a wide chart. A year of

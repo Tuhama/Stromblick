@@ -1,16 +1,8 @@
-import { MARKET_TIME_ZONE, type Point } from "@stromblick/shared";
+import { berlinDay, nextDay, type Point } from "@stromblick/shared";
 import { dayCount } from "../series/resolution";
 
 /** A long range with many holes would fill the model's context with dates; the rest is counted. */
 const MAX_LISTED_DAYS = 31;
-
-const DAY_MS = 86_400_000;
-const berlinDate = new Intl.DateTimeFormat("sv-SE", {
-  timeZone: MARKET_TIME_ZONE,
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
 
 export interface DaysWithoutData {
   /** Berlin calendar days (YYYY-MM-DD) of the range that have no reading at all. */
@@ -29,12 +21,12 @@ export function daysWithoutData(
   to: string,
   points: readonly Point[],
 ): DaysWithoutData {
-  const withData = new Set(points.map(([time]) => berlinDate.format(time)));
-  const start = Date.parse(from);
+  const withData = new Set(points.map(([time]) => berlinDay(time)));
   const missing: string[] = [];
-  for (let offset = 0; offset < dayCount(from, to); offset += 1) {
-    const day = new Date(start + offset * DAY_MS).toISOString().slice(0, 10);
+  let day = from;
+  for (let counted = 0; counted < dayCount(from, to); counted += 1) {
     if (!withData.has(day)) missing.push(day);
+    day = nextDay(day);
   }
   return {
     days: missing.slice(0, MAX_LISTED_DAYS),

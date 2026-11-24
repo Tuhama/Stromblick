@@ -1,13 +1,13 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import {
+  MINUTE,
+  type ReadingsQuery,
   ReadingsResponse,
+  type SeriesKey,
   SeriesListResponse,
   StatusResponse,
   TomorrowResponse,
-  type ReadingsQuery,
-  type SeriesKey,
 } from "@stromblick/shared";
-import { MINUTE } from "../time/units";
 import { getJson } from "./client";
 
 // staleTime follows the API's Cache-Control: no refetch while the browser would answer from its cache anyway.

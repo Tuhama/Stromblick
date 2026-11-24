@@ -1,4 +1,6 @@
-import { MARKET_TIME_ZONE } from "@stromblick/shared";
+import { berlinDay, MARKET_TIME_ZONE } from "@stromblick/shared";
+
+export { berlinDay };
 
 // The market runs on German time: a delivery day is a Berlin calendar day, and "cheapest at 13:15"
 // only means something on German clocks. So days and times are shown in it wherever the reader is,
@@ -18,11 +20,6 @@ function berlinFormatter(locale: string, options: Intl.DateTimeFormatOptions): I
     formatters.set(id, formatter);
   }
   return formatter;
-}
-
-/** A moment's Berlin calendar day as YYYY-MM-DD. The Canadian English locale writes it that way. */
-export function berlinDay(moment: Date | number): string {
-  return berlinFormatter("en-CA", {}).format(moment);
 }
 
 /** A moment's Berlin calendar month as YYYY-MM. */
