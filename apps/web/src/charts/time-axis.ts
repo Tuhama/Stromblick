@@ -10,13 +10,20 @@ import type { ChartColors } from "./chart-colors";
 import type { ChartOption } from "./echarts";
 
 /** How the axis is labelled, by how much time the chart covers. */
-export type AxisTier = "hours" | "days" | "months";
+export type AxisTier = "hours" | "days" | "weeks" | "months";
 
 export function axisTier(first: number, last: number): AxisTier {
   const span = last - first;
   if (span <= 36 * HOUR) return "hours";
   if (span <= 14 * DAY) return "days";
+  if (span <= 70 * DAY) return "weeks";
   return "months";
+}
+
+/** Whether a moment falls on a Monday in Berlin. */
+function isMonday(time: number): boolean {
+  // Noon UTC is the same calendar day in Berlin in every season.
+  return new Date(`${berlinDay(time)}T12:00:00Z`).getUTCDay() === 1;
 }
 
 /** The first time of each run of times that share a key, e.g. the first point of each day. */
@@ -34,7 +41,8 @@ function firstOfEach(times: readonly number[], key: (time: number) => string): n
 /**
  * The times to label, in Berlin time. ECharts would pick its own by the browser's clock, which is
  * uneven for readers elsewhere. A day or less: every fourth full hour (00:00, 04:00, …). Up to two
- * weeks: the first point of each day. Longer: the first point of each month.
+ * weeks: the first point of each day. Up to ten weeks: the first point of each Monday. Longer: the
+ * first point of each month.
  */
 export function axisTicks(times: readonly number[]): number[] {
   const first = times[0];
@@ -49,6 +57,8 @@ export function axisTicks(times: readonly number[]): number[] {
       });
     case "days":
       return firstOfEach(times, berlinDay);
+    case "weeks":
+      return firstOfEach(times, berlinDay).filter(isMonday);
     case "months":
       return firstOfEach(times, berlinMonth);
   }
@@ -57,7 +67,7 @@ export function axisTicks(times: readonly number[]): number[] {
 /** One axis label, in the style of the tier. */
 export function tickLabel(time: number, tier: AxisTier, language: string): string {
   if (tier === "hours") return formatClock(time);
-  return tier === "days" ? formatDayLabel(time, language) : formatMonthLabel(time, language);
+  return tier === "months" ? formatMonthLabel(time, language) : formatDayLabel(time, language);
 }
 
 interface TimeAxisInput {

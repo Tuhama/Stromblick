@@ -1,6 +1,5 @@
 import type { RouteObject } from "react-router";
 import { ExplainPage } from "../features/explain/ExplainPage";
-import { ExplorerPage } from "../features/explorer/ExplorerPage";
 import { OverviewPage } from "../features/overview/OverviewPage";
 import { TomorrowPage } from "../features/tomorrow/TomorrowPage";
 import { AppLayout } from "../layout/AppLayout";
@@ -19,7 +18,13 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <OverviewPage /> },
           { path: "tomorrow", element: <TomorrowPage /> },
-          { path: "explorer", element: <ExplorerPage /> },
+          {
+            // Loaded when the page is opened: its code would push the first load over the size budget.
+            path: "explorer",
+            lazy: async () => ({
+              Component: (await import("../features/explorer/ExplorerPage")).ExplorerPage,
+            }),
+          },
           { path: "explain", element: <ExplainPage /> },
           { path: "*", element: <NotFoundPage /> },
         ],

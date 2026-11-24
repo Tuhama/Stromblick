@@ -11,6 +11,7 @@ describe("axisTier", () => {
   it("chooses by how much time the chart covers", () => {
     expect(axisTier(MIDNIGHT, MIDNIGHT + DAY)).toBe("hours");
     expect(axisTier(MIDNIGHT, MIDNIGHT + 7 * DAY)).toBe("days");
+    expect(axisTier(MIDNIGHT, MIDNIGHT + 30 * DAY)).toBe("weeks");
     expect(axisTier(MIDNIGHT, MIDNIGHT + 365 * DAY)).toBe("months");
   });
 });
@@ -24,6 +25,12 @@ describe("axisTicks", () => {
   it("picks the first point of each Berlin day for a week", () => {
     const week = every(MIDNIGHT, HOUR, 7 * 24);
     expect(axisTicks(week)).toEqual(every(MIDNIGHT, DAY, 7));
+  });
+
+  it("picks the first point of each Berlin Monday for a month", () => {
+    // 14 November 2026 is a Saturday: the Mondays are the 16th, 23rd and 30th, and 7 December.
+    const month = every(MIDNIGHT, HOUR, 30 * 24);
+    expect(axisTicks(month)).toEqual([2, 9, 16, 23].map((days) => MIDNIGHT + days * DAY));
   });
 
   it("picks the first point of each Berlin month for a year", () => {
@@ -43,6 +50,7 @@ describe("tickLabel", () => {
     expect(tickLabel(time, "hours", "en")).toBe("11:00");
     expect(tickLabel(time, "days", "en")).toBe("Nov 14");
     expect(tickLabel(time, "days", "de")).toBe("14. Nov.");
+    expect(tickLabel(time, "weeks", "en")).toBe("Nov 14");
     expect(tickLabel(time, "months", "en")).toBe("Nov");
     expect(tickLabel(time, "months", "de")).toBe("Nov");
   });

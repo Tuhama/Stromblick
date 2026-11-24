@@ -17,13 +17,21 @@ interface DataTableProps {
   rows: readonly DataTableRow[];
   /** Writes a number in the reader's language. */
   formatValue: (value: number) => string;
+  /** Writes the time of a row. The clock time by default: right for a table of one day. */
+  formatTime?: (time: number) => string;
 }
 
 /**
  * The numbers behind a chart, as a table: a chart's canvas can't be read or tabbed through, a table
  * can. Closed by default, so a day of quarter-hours doesn't push the page down.
  */
-export function DataTable({ caption, columns, rows, formatValue }: DataTableProps) {
+export function DataTable({
+  caption,
+  columns,
+  rows,
+  formatValue,
+  formatTime = formatClock,
+}: DataTableProps) {
   const { t } = useTranslation();
   const captionId = useId();
 
@@ -59,7 +67,7 @@ export function DataTable({ caption, columns, rows, formatValue }: DataTableProp
             {rows.map((row) => (
               <tr key={row.time} className="border-t border-border">
                 <th scope="row" className="px-3 py-1 text-left font-normal tabular-nums">
-                  {formatClock(row.time)}
+                  {formatTime(row.time)}
                 </th>
                 {row.values.map((value, index) => (
                   <td key={columns[index]} className="px-3 py-1 text-right tabular-nums">

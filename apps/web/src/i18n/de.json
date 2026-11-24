@@ -96,7 +96,43 @@
   },
   "explorer": {
     "title": "Explorer",
-    "intro": "Jede Datenreihe in jedem Zeitraum, per Link teilbar."
+    "intro": "Jede Datenreihe in jedem Zeitraum, per Link teilbar.",
+    "series": {
+      "label": "Datenreihe",
+      "kind": {
+        "price": "Preis",
+        "load": "Last",
+        "generation": "Erzeugung"
+      }
+    },
+    "range": {
+      "legend": "Zeitraum",
+      "day": "Tag",
+      "week": "Woche",
+      "month": "Monat",
+      "year": "Jahr"
+    },
+    "earlier": "Früher",
+    "later": "Später",
+    "end": "Letzter Tag",
+    "heading": "{{series}}, {{period}}",
+    "resolution": {
+      "quarterhour": "Ein Wert pro Viertelstunde.",
+      "hour": "Ein Wert pro Stunde.",
+      "day": "Ein Wert pro Tag."
+    },
+    "note": "{{resolution}} Alle Uhrzeiten in deutscher Zeit ({{zone}}).",
+    "error": "Die Werte konnten nicht geladen werden.",
+    "empty": "Für diesen Zeitraum liegen keine Messwerte vor. Ein späterer Zeitraum ist möglich.",
+    "figures": {
+      "low": "Niedrigster",
+      "high": "Höchster",
+      "average": "Durchschnitt"
+    },
+    "chartLabel": "Liniendiagramm: {{series}}, {{period}}, in {{unit}}. Niedrigster Wert {{low}}, höchster {{high}}.",
+    "tableCaption": "{{series}}, {{period}}, in {{unit}}, in deutscher Zeit ({{zone}})",
+    "column": "{{unit}}",
+    "noteEnergy": "{{resolution}} Energie in MWh pro Intervall. Alle Uhrzeiten in deutscher Zeit ({{zone}})."
   },
   "explain": {
     "title": "Tag erklären",
