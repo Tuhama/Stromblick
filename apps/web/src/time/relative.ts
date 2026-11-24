@@ -1,4 +1,4 @@
-import { DAY, HOUR, MINUTE } from "./units";
+import { DAY, HOUR, MINUTE } from "@stromblick/shared";
 
 /**
  * How long ago a moment was, in the reader's language: "20 minutes ago", "vor 2 Stunden".

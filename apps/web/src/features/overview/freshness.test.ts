@@ -1,5 +1,5 @@
+import { HOUR } from "@stromblick/shared";
 import { describe, expect, it } from "vitest";
-import { HOUR } from "../../time/units";
 import { isOutdated, STALE_AFTER } from "./freshness";
 
 describe("isOutdated", () => {

@@ -1,6 +1,6 @@
+import { HOUR, MINUTE } from "@stromblick/shared";
 import type { Point } from "@stromblick/shared";
 import { describe, expect, it } from "vitest";
-import { HOUR, MINUTE } from "../time/units";
 import { breakAtGaps } from "./gaps";
 
 const START = Date.parse("2026-11-19T00:00:00Z");

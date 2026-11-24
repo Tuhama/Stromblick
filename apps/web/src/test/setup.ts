@@ -5,11 +5,11 @@ import { createElement } from "react";
 import { afterEach, beforeEach, vi } from "vitest";
 import {
   DAY_AHEAD_PRICE_KEY,
+  MINUTE,
   type ReadingsResponse,
   type StatusResponse,
 } from "@stromblick/shared";
 import { initI18n } from "../i18n";
-import { MINUTE } from "../time/units";
 import { mockSystemTheme } from "./media";
 
 initI18n();

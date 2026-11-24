@@ -1,3 +1,4 @@
+import { MINUTE } from "@stromblick/shared";
 import { existsSync } from "node:fs";
 import { createApp } from "./app";
 import { createGeminiClientFromKey } from "./assistant/gemini-client";
@@ -13,7 +14,6 @@ import { loadLatest, type LatestRequest } from "./series/load-latest";
 import { loadReadings, type ReadingsRequest } from "./series/load-readings";
 import { createSmardClient } from "./smard/client";
 import { loadStatus } from "./status/load-status";
-import { MINUTE } from "./time-units";
 
 // Local development reads apps/api/.env; in production the platform sets real env vars.
 if (existsSync(".env")) process.loadEnvFile(".env");

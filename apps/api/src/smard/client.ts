@@ -1,6 +1,6 @@
+import { HOUR, MINUTE } from "@stromblick/shared";
 import type { z } from "zod";
 import type { SmardResolution, SmardSource } from "./catalog";
-import { HOUR, MINUTE } from "../time-units";
 import { SmardIndex, SmardWeek } from "./schemas";
 
 export const SMARD_BASE_URL = "https://www.smard.de/app";

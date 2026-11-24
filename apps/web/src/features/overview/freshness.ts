@@ -1,4 +1,4 @@
-import { HOUR } from "../../time/units";
+import { HOUR } from "@stromblick/shared";
 
 /**
  * How old the last successful update may be before the page warns. The API ingests hourly

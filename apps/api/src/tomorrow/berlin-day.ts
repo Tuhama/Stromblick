@@ -1,24 +1,12 @@
-import { MARKET_TIME_ZONE } from "@stromblick/shared";
-import { DAY, MINUTE } from "../time-units";
+import { MARKET_TIME_ZONE, MINUTE, nextDay } from "@stromblick/shared";
 
 /** The length of one price slot of the day-ahead market. */
 export const SLOT_MS = 15 * MINUTE;
 
-const dayFormat = new Intl.DateTimeFormat("en-CA", { timeZone: MARKET_TIME_ZONE });
 const offsetFormat = new Intl.DateTimeFormat("en-US", {
   timeZone: MARKET_TIME_ZONE,
   timeZoneName: "longOffset",
 });
-
-/** A moment's calendar day in Berlin, e.g. "2026-11-23". */
-export function berlinDay(moment: Date | number): string {
-  return dayFormat.format(moment);
-}
-
-/** The calendar day after `day`. Calendar arithmetic, so a 23 or 25 hour day changes nothing. */
-export function nextDay(day: string): string {
-  return new Date(Date.parse(day) + DAY).toISOString().slice(0, 10);
-}
 
 /** Berlin's offset from UTC at a moment, in milliseconds (+1 h in winter, +2 h in summer). */
 function offsetAt(moment: number): number {

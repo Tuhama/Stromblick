@@ -1,3 +1,4 @@
+import { DAY } from "@stromblick/shared";
 import type { Logger } from "pino";
 import type { SeriesKind } from "@stromblick/shared";
 import type { Db } from "../db";
@@ -7,7 +8,6 @@ import type {
 } from "../generated/prisma/enums";
 import { SMARD_SERIES, type SmardResolution, type SmardSeries } from "../smard/catalog";
 import { weeksSince, type SmardClient, type SmardReading } from "../smard/client";
-import { DAY } from "../time-units";
 
 const DB_KIND = {
   generation: "GENERATION",

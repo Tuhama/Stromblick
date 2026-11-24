@@ -1,5 +1,5 @@
+import { MINUTE } from "@stromblick/shared";
 import type { Point } from "@stromblick/shared";
-import { MINUTE } from "../time/units";
 
 /** A fixed start for sample data: midnight in Berlin on 1 January 2026. */
 export const SAMPLE_START = Date.parse("2025-12-31T23:00:00Z");

@@ -7,3 +7,4 @@ export * from "./status";
 export * from "./market";
 export * from "./assistant";
 export * from "./tomorrow";
+export * from "./time";
