@@ -81,3 +81,51 @@
     @apply outline-2 outline-offset-2 outline-ring;
   }
 }
+
+/*
+ * The color square in a chart tooltip. ECharts builds tooltips from HTML strings, and the Content
+ * Security Policy forbids style attributes in them, so the square gets its color from a class.
+ * Series beyond the eighth keep the default color.
+ */
+@layer components {
+  .tooltip-swatch {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 6px;
+    border-radius: 2px;
+    background: var(--primary);
+  }
+
+  .tooltip-swatch-1 {
+    background: var(--series-1);
+  }
+
+  .tooltip-swatch-2 {
+    background: var(--series-2);
+  }
+
+  .tooltip-swatch-3 {
+    background: var(--series-3);
+  }
+
+  .tooltip-swatch-4 {
+    background: var(--series-4);
+  }
+
+  .tooltip-swatch-5 {
+    background: var(--series-5);
+  }
+
+  .tooltip-swatch-6 {
+    background: var(--series-6);
+  }
+
+  .tooltip-swatch-7 {
+    background: var(--series-7);
+  }
+
+  .tooltip-swatch-8 {
+    background: var(--series-8);
+  }
+}

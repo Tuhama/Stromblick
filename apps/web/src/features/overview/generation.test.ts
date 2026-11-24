@@ -123,6 +123,20 @@ describe("generationOption", () => {
     );
   });
 
+  it("builds the tooltip without style attributes, so a strict Content Security Policy allows it", () => {
+    const option = build(1, 60);
+    const { formatter } = option.tooltip as { formatter: (params: unknown) => string };
+    const time = SAMPLE_START;
+    const html = formatter([
+      { seriesIndex: 0, seriesName: "Solar", value: [time, 10] },
+      { seriesIndex: 3, seriesName: "Hydro", value: [time, 2] },
+    ]);
+    expect(html).not.toContain("style=");
+    // The top layer comes first, and a swatch takes its color from the class of its series.
+    expect(html).toContain('<span class="tooltip-swatch tooltip-swatch-4"></span>Hydro');
+    expect(html).toContain('<span class="tooltip-swatch tooltip-swatch-1"></span>Solar');
+  });
+
   it("separates the layers with a surface-colored line", () => {
     const [first] = build(1, 60).series as { lineStyle: unknown }[];
     expect(first?.lineStyle).toEqual({ color: "#ffffff", width: 2 });

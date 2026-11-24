@@ -1,3 +1,5 @@
+// First on purpose: it must run before the shared schemas are created (see the file).
+import "./security/strict-csp-init";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
