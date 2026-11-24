@@ -6,5 +6,16 @@
       "destination": "https://stromblickapi-production.up.railway.app/:path*"
     },
     { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy-Report-Only",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https://stromblickapi-production.up.railway.app; object-src 'none'; base-uri 'self'; form-action 'self'"
+        }
+      ]
+    }
   ]
 }

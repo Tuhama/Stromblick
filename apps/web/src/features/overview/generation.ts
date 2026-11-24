@@ -115,9 +115,11 @@ export function generationOption({
         // The top layer first, like the picture.
         const rows = [...hovered].reverse().flatMap((item) => {
           const point = readPoint(item.value);
-          const color = colors.series[item.seriesIndex ?? 0] ?? colors.line;
           if (!point) return [];
-          const swatch = `<span style="display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;background:${color}"></span>`;
+          // The swatch takes its color from a class (see index.css): a style attribute in this HTML
+          // string would break the Content Security Policy.
+          const slot = (item.seriesIndex ?? 0) + 1;
+          const swatch = `<span class="tooltip-swatch tooltip-swatch-${String(slot)}"></span>`;
           return [`${swatch}${item.seriesName ?? ""}: ${formatEnergy(point[1], language)}`];
         });
         const total = hovered.reduce((sum, item) => sum + (readPoint(item.value)?.[1] ?? 0), 0);
