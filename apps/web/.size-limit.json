@@ -3,7 +3,8 @@
   { "name": "Stylesheet", "path": "dist/assets/*.css", "limit": "5 kB" },
   {
     "name": "Chart code (loaded later)",
-    "path": ["dist/assets/*.js", "!dist/assets/index-*.js"],
+    "path": ["dist/assets/*.js", "!dist/assets/index-*.js", "!dist/assets/LegalPages-*.js"],
     "limit": "150 kB"
-  }
+  },
+  { "name": "Legal pages (loaded later)", "path": "dist/assets/LegalPages-*.js", "limit": "8 kB" }
 ]

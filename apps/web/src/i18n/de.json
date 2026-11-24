@@ -159,7 +159,7 @@
     "thinking": "Denkt nach …",
     "lookingUp": "Daten werden abgerufen …",
     "truncated": "Die Antwort hat die Längengrenze erreicht und ist möglicherweise abgeschnitten.",
-    "privacy": "Deine Fragen werden an Googles Gemini-Dienst (kostenlose Stufe) gesendet, der sie zur Verbesserung seiner Produkte nutzen darf. Bitte gib keine persönlichen Daten ein. Der Assistent kann sich irren: Prüfe wichtige Zahlen in den Diagrammen.",
+    "privacy": "Deine Fragen und die früheren Nachrichten dieses Gesprächs werden an Googles Gemini-Dienst gesendet. Google behandelt sie als kostenpflichtigen Dienst und nutzt sie nicht, um seine Produkte zu verbessern. Bitte gib keine persönlichen Daten ein. Der Assistent kann sich irren: Prüfe wichtige Zahlen in den Diagrammen. Mehr steht in der Datenschutzerklärung.",
     "errors": {
       "rate_limited": "Der Assistent hat sein kostenloses Kontingent vorerst aufgebraucht. Bitte versuche es in einigen Minuten erneut.",
       "unavailable": "Der Modelldienst ist gerade nicht erreichbar. Bitte versuche es gleich noch einmal.",
@@ -210,6 +210,12 @@
       "lignite": "Braunkohle",
       "other": "Sonstige"
     }
+  },
+  "footer": {
+    "label": "Rechtliches",
+    "data": "Daten:",
+    "imprint": "Impressum",
+    "privacy": "Datenschutz"
   },
   "notice": {
     "warning": "Hinweis:"

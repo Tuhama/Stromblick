@@ -159,7 +159,7 @@
     "thinking": "Thinking…",
     "lookingUp": "Looking up data…",
     "truncated": "The answer reached its length limit and may be cut off.",
-    "privacy": "Your questions are sent to Google's Gemini service (free tier), which may use them to improve its products. Please don't enter personal data. The assistant can be wrong: check important figures in the charts.",
+    "privacy": "Your questions and the earlier messages of this chat are sent to Google's Gemini service. Google treats them as a paid service and does not use them to improve its products. Please don't enter personal data. The assistant can be wrong: check important figures in the charts. More is in the privacy notice.",
     "errors": {
       "rate_limited": "The assistant has used up its free quota for now. Please try again in a few minutes.",
       "unavailable": "The model service isn't available right now. Please try again in a moment.",
@@ -210,6 +210,12 @@
       "lignite": "Lignite",
       "other": "Other"
     }
+  },
+  "footer": {
+    "label": "Legal",
+    "data": "Data:",
+    "imprint": "Legal notice",
+    "privacy": "Privacy notice"
   },
   "notice": {
     "warning": "Warning:"

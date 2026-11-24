@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Outlet } from "react-router";
+import { Footer } from "./Footer";
 import { Header } from "./Header";
 
 export function AppLayout() {
@@ -17,6 +18,7 @@ export function AppLayout() {
       <main id="main" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6">
         <Outlet />
       </main>
+      <Footer />
     </div>
   );
 }
