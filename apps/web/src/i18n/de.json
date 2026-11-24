@@ -69,7 +69,30 @@
   },
   "tomorrow": {
     "title": "Morgen",
-    "intro": "Die Day-Ahead-Preise für morgen und die günstigsten Stunden für den Stromverbrauch."
+    "intro": "Die Day-Ahead-Preise für morgen und die günstigsten Stunden für den Stromverbrauch.",
+    "heading": "Day-Ahead-Preis am {{day}}",
+    "loading": "Die Preise für morgen werden geladen…",
+    "error": "Die Preise für morgen konnten nicht geladen werden.",
+    "notPublished": "Die Preise für {{day}} sind noch nicht veröffentlicht. Sie erscheinen meist gegen 13:00 Uhr deutscher Zeit.",
+    "notPublishedNewest": "Die Preise für {{day}} sind noch nicht veröffentlicht. Sie erscheinen meist gegen 13:00 Uhr deutscher Zeit. Die neuesten vorhandenen Preise reichen bis {{time}}.",
+    "incomplete": "Für {{day}} fehlen an der Quelle einige Viertelstunden. Zeitfenster, die sie enthalten würden, werden weggelassen.",
+    "picker": {
+      "legend": "Länge des Zeitfensters",
+      "option_one": "{{count}} Stunde",
+      "option_other": "{{count}} Stunden"
+    },
+    "cheapest_one": "Günstigste Stunde",
+    "cheapest_other": "Günstigste {{count}} Stunden",
+    "mostExpensive_one": "Teuerste Stunde",
+    "mostExpensive_other": "Teuerste {{count}} Stunden",
+    "average": "{{price}} {{unit}} im Durchschnitt",
+    "noWindow": "Es gibt kein vollständiges Zeitfenster: Es fehlen Viertelstunden.",
+    "chart": {
+      "cheapest": "Günstigste",
+      "mostExpensive": "Teuerste"
+    },
+    "chartLabel": "Liniendiagramm des Day-Ahead-Preises für morgen in {{unit}}. Markiert sind das günstigste und das teuerste {{hours}}-Stunden-Fenster: günstigstes {{cheapest}}, teuerstes {{expensive}}.",
+    "tableCaption": "Day-Ahead-Preis am {{day}} nach Uhrzeit, in deutscher Zeit ({{zone}})"
   },
   "explorer": {
     "title": "Explorer",

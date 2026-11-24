@@ -3,6 +3,7 @@ import {
   ReadingsResponse,
   SeriesListResponse,
   StatusResponse,
+  TomorrowResponse,
   type ReadingsQuery,
   type SeriesKey,
 } from "@stromblick/shared";
@@ -44,6 +45,23 @@ export function statusQuery() {
   });
 }
 
+/**
+ * GET /tomorrow: tomorrow's prices and windows. Asked again every five minutes until the day is
+ * complete, so a visitor waiting for the afternoon publication sees the prices appear; a finished
+ * day only needs a look now and then, to notice that midnight has passed.
+ */
+export function tomorrowQuery() {
+  return queryOptions({
+    queryKey: ["tomorrow"],
+    queryFn: ({ signal }) => getJson("/tomorrow", TomorrowResponse, { signal }),
+    staleTime: MINUTE,
+    refetchInterval: (query) => {
+      const data = query.state.data;
+      return data?.status === "published" && data.complete ? 30 * MINUTE : 5 * MINUTE;
+    },
+  });
+}
+
 // Each hook returns TanStack Query's result: `data`, plus `isPending`, `isError` and `error`
 // for the loading and error states.
 
@@ -57,4 +75,8 @@ export function useReadings(key: SeriesKey, query: ReadingsQuery) {
 
 export function useStatus() {
   return useQuery(statusQuery());
+}
+
+export function useTomorrow() {
+  return useQuery(tomorrowQuery());
 }

@@ -9,7 +9,8 @@ import { currentLanguage } from "../../i18n";
 import { berlinZoneName, formatClock, todayInBerlin } from "../../time/berlin";
 import { formatMoment } from "./newest-data";
 import { formatPrice, summarizePrices, type PriceSummary } from "./price";
-import { convertPrice, PRICE_UNITS, usePriceUnit } from "./price-unit";
+import { convertPrice, usePriceUnit } from "./price-unit";
+import { PriceUnitSelect } from "./PriceUnitSelect";
 import { useNewestData } from "./use-newest-data";
 
 // Its own chunk: ECharts is downloaded after the page is on screen, not before.
@@ -19,7 +20,6 @@ const PriceChart = lazy(() => import("./PriceChart"));
 export function PriceToday() {
   const { t } = useTranslation();
   const titleId = useId();
-  const unitId = useId();
   const { unit, setUnit } = usePriceUnit();
   const today = todayInBerlin();
   const readings = useReadings(DAY_AHEAD_PRICE_KEY, { from: today, to: today });
@@ -46,25 +46,7 @@ export function PriceToday() {
         <h2 id={titleId} className="text-lg font-semibold">
           {t("overview.price.title")}
         </h2>
-        <div>
-          <label htmlFor={unitId} className="sr-only">
-            {t("overview.price.unit")}
-          </label>
-          <select
-            id={unitId}
-            value={unit}
-            onChange={(event) => {
-              setUnit(event.target.value);
-            }}
-            className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
-          >
-            {PRICE_UNITS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
+        <PriceUnitSelect unit={unit} onChange={setUnit} />
       </div>
       <div className="mt-3">
         <ChartPanel

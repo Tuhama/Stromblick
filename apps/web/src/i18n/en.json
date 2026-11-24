@@ -69,7 +69,30 @@
   },
   "tomorrow": {
     "title": "Tomorrow",
-    "intro": "Tomorrow's day-ahead prices and the cheapest hours to use electricity."
+    "intro": "Tomorrow's day-ahead prices and the cheapest hours to use electricity.",
+    "heading": "Day-ahead price on {{day}}",
+    "loading": "Loading tomorrow's prices…",
+    "error": "Tomorrow's prices couldn't be loaded.",
+    "notPublished": "The prices for {{day}} aren't published yet. They usually appear around 13:00 German time.",
+    "notPublishedNewest": "The prices for {{day}} aren't published yet. They usually appear around 13:00 German time. The newest prices we have run up to {{time}}.",
+    "incomplete": "Some quarter-hours of {{day}} are missing at the source. Windows that would include them are left out.",
+    "picker": {
+      "legend": "Window length",
+      "option_one": "{{count}} hour",
+      "option_other": "{{count}} hours"
+    },
+    "cheapest_one": "Cheapest hour",
+    "cheapest_other": "Cheapest {{count}} hours",
+    "mostExpensive_one": "Most expensive hour",
+    "mostExpensive_other": "Most expensive {{count}} hours",
+    "average": "{{price}} {{unit}} on average",
+    "noWindow": "There is no complete window to show: quarter-hours are missing.",
+    "chart": {
+      "cheapest": "Cheapest",
+      "mostExpensive": "Most expensive"
+    },
+    "chartLabel": "Line chart of tomorrow's day-ahead price in {{unit}}. The cheapest and the most expensive {{hours}}-hour window are marked: cheapest {{cheapest}}, most expensive {{expensive}}.",
+    "tableCaption": "Day-ahead price on {{day}} by time, in German time ({{zone}})"
   },
   "explorer": {
     "title": "Explorer",

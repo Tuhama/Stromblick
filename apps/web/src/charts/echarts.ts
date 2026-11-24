@@ -1,6 +1,7 @@
 import { LineChart, type LineSeriesOption } from "echarts/charts";
 import {
   GridComponent,
+  MarkAreaComponent,
   TooltipComponent,
   type GridComponentOption,
   type TooltipComponentOption,
@@ -10,7 +11,7 @@ import type { ComposeOption } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 
 // Only the parts in use are registered, so the rest of ECharts stays out of the bundle.
-echarts.use([LineChart, GridComponent, TooltipComponent, CanvasRenderer]);
+echarts.use([LineChart, GridComponent, MarkAreaComponent, TooltipComponent, CanvasRenderer]);
 
 export { echarts };
 
