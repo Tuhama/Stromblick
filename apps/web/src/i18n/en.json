@@ -2,7 +2,8 @@
   "app": {
     "name": "Stromblick",
     "tagline": "Germany's electricity market, live",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "loadingPage": "Loading the page…"
   },
   "nav": {
     "label": "Main",
