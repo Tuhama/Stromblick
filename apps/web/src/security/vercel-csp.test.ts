@@ -14,8 +14,8 @@ const config = VercelConfig.parse(JSON.parse(vercelJson));
 function readPolicy() {
   const header = config.headers
     .find((entry) => entry.source === "/(.*)")
-    ?.headers.find((item) => item.key.startsWith("Content-Security-Policy"));
-  if (!header) throw new Error("vercel.json sends no Content Security Policy for /(.*)");
+    ?.headers.find((item) => item.key === "Content-Security-Policy");
+  if (!header) throw new Error("vercel.json sends no enforced Content-Security-Policy for /(.*)");
   const directives = new Map<string, string[]>();
   for (const part of header.value.split(";")) {
     const [name, ...sources] = part.trim().split(/\s+/);
@@ -44,6 +44,7 @@ describe("the Content Security Policy in vercel.json", () => {
     expect(directives.get("object-src")).toEqual(["'none'"]);
     expect(directives.get("base-uri")).toEqual(["'self'"]);
     expect(directives.get("form-action")).toEqual(["'self'"]);
+    expect(directives.get("frame-ancestors")).toEqual(["'none'"]);
   });
 
   it("lets the browser call the API that the /api rewrite points to", () => {
