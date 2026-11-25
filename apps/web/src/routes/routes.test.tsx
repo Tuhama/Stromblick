@@ -21,6 +21,11 @@ describe("routes", () => {
     expect(await screen.findByRole("heading", { level: 1, name: title })).toBeInTheDocument();
   });
 
+  it("shows a loading text while a lazily loaded page is first fetched", () => {
+    renderApp("/impressum");
+    expect(screen.getByRole("status")).toHaveTextContent("Loading the page…");
+  });
+
   it("navigates with the header links", async () => {
     const user = userEvent.setup();
     renderApp("/");

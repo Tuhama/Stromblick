@@ -5,12 +5,14 @@ import { TomorrowPage } from "../features/tomorrow/TomorrowPage";
 import { AppLayout } from "../layout/AppLayout";
 import { NotFoundPage } from "./NotFoundPage";
 import { RouteError } from "./RouteError";
+import { RouteFallback } from "./RouteFallback";
 
 /** The app's pages. Shared by the browser router and the tests' memory router. */
 export const routes: RouteObject[] = [
   {
     path: "/",
     element: <AppLayout />,
+    HydrateFallback: RouteFallback,
     children: [
       {
         // A page that throws shows the error inside the layout, so the navigation stays usable.

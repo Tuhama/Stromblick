@@ -2,7 +2,8 @@
   "app": {
     "name": "Stromblick",
     "tagline": "Der deutsche Strommarkt, live",
-    "skipToContent": "Zum Inhalt springen"
+    "skipToContent": "Zum Inhalt springen",
+    "loadingPage": "Die Seite wird geladen …"
   },
   "nav": {
     "label": "Hauptnavigation",
