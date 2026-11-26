@@ -1,10 +1,33 @@
 [
-  { "name": "Initial JavaScript", "path": "dist/assets/index-*.js", "limit": "150 kB" },
-  { "name": "Stylesheet", "path": "dist/assets/*.css", "limit": "5 kB" },
+  {
+    "name": "Initial JavaScript",
+    "path": ["dist/assets/index-*.js", "dist/assets/react-*.js"],
+    "limit": "152 kB"
+  },
+  {
+    "name": "Stylesheet",
+    "path": "dist/assets/*.css",
+    "limit": "5 kB"
+  },
   {
     "name": "Chart code (loaded later)",
-    "path": ["dist/assets/*.js", "!dist/assets/index-*.js", "!dist/assets/LegalPages-*.js"],
+    "path": [
+      "dist/assets/*.js",
+      "!dist/assets/index-*.js",
+      "!dist/assets/react-*.js",
+      "!dist/assets/LegalPages-*.js",
+      "!dist/assets/sentry-client-*.js"
+    ],
     "limit": "150 kB"
   },
-  { "name": "Legal pages (loaded later)", "path": "dist/assets/LegalPages-*.js", "limit": "8 kB" }
+  {
+    "name": "Legal pages (loaded later)",
+    "path": "dist/assets/LegalPages-*.js",
+    "limit": "8 kB"
+  },
+  {
+    "name": "Error reporting (loaded after the first render)",
+    "path": "dist/assets/sentry-client-*.js",
+    "limit": "45 kB"
+  }
 ]

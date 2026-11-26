@@ -6,6 +6,8 @@ import { createModelBudget } from "./assistant/model-budget";
 import { createTools } from "./assistant/tools";
 import { createDb } from "./db";
 import { loadEnv } from "./env";
+import { noopReporter } from "./observability/error-reporter";
+import { createSentryReporter } from "./observability/sentry-reporter";
 import { runIngest } from "./ingest/run";
 import { singleFlight } from "./ingest/single-flight";
 import { startIngestTimer } from "./ingest/timer";
@@ -20,11 +22,20 @@ if (existsSync(".env")) process.loadEnvFile(".env");
 
 const env = loadEnv();
 const logger = createLogger(env);
+// Without a DSN nothing is reported: the SDK is not even started.
+const reporter =
+  env.SENTRY_DSN === undefined
+    ? noopReporter
+    : createSentryReporter({
+        dsn: env.SENTRY_DSN,
+        environment: env.SENTRY_ENVIRONMENT,
+        release: env.RAILWAY_GIT_COMMIT_SHA,
+      });
 const db = createDb(env.DATABASE_URL);
 const smard = createSmardClient();
 
 // One guard for both callers: a timer tick and POST /ingest can never run at the same time.
-const ingest = singleFlight(() => runIngest({ db, smard, logger }));
+const ingest = singleFlight(() => runIngest({ db, smard, logger, reporter }));
 
 const readings = (request: ReadingsRequest) => loadReadings(db, request);
 
@@ -44,8 +55,14 @@ const assistant =
           perDay: env.ASSISTANT_MODEL_REQUESTS_PER_DAY,
         }),
         questionsPerMinute: env.ASSISTANT_QUESTIONS_PER_MINUTE,
+        reporter,
       };
 
+logger.info(
+  env.SENTRY_DSN === undefined
+    ? "Error reporting off (SENTRY_DSN is unset)"
+    : `Error reporting on (${env.SENTRY_ENVIRONMENT})`,
+);
 logger.info(
   assistant === undefined
     ? "Assistant off (GEMINI_API_KEY is unset)"
@@ -66,6 +83,7 @@ const app = createApp({
   status,
   rateLimitPerMinute: env.RATE_LIMIT_PER_MINUTE,
   assistant,
+  reporter,
 });
 
 const stopIngestTimer =
@@ -100,7 +118,11 @@ function shutdown(signal: NodeJS.Signals) {
   logger.info({ signal }, "Shutting down");
   stopIngestTimer?.();
   server.close(() => {
-    void db.$disconnect().finally(() => process.exit(0));
+    // Send what is still waiting before the process ends.
+    void reporter
+      .flush(2000)
+      .then(() => db.$disconnect())
+      .finally(() => process.exit(0));
   });
   setTimeout(() => process.exit(1), 10_000).unref();
 }

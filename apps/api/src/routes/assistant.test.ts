@@ -9,6 +9,8 @@ import { scriptedLlm } from "../assistant/fake-llm";
 import { LlmError, type LlmClient } from "../assistant/llm-client";
 import { createModelBudget, type ModelBudget } from "../assistant/model-budget";
 import type { AssistantTool } from "../assistant/tools";
+import type { ErrorReporter } from "../observability/error-reporter";
+import { recordingReporter } from "../observability/recording-reporter";
 
 const tool: AssistantTool = {
   spec: { name: "get_value", description: "d", parameters: { type: "object" } },
@@ -22,6 +24,7 @@ function appWith(
     perMinute?: number;
     perDay?: number;
     budget?: ModelBudget;
+    reporter?: ErrorReporter;
   } = {},
 ) {
   const logger = pino({ level: "silent" });
@@ -40,6 +43,7 @@ function appWith(
         options.budget ??
         createModelBudget({ perMinute: options.perMinute ?? 100, perDay: options.perDay ?? 1000 }),
       questionsPerMinute: options.questionsPerMinute ?? 100,
+      ...(options.reporter ? { reporter: options.reporter } : {}),
     },
   });
 }
@@ -189,6 +193,32 @@ describe("POST /assistant", () => {
     const res = await ask(appWith(broken));
     expect(parseEvents(res.text)).toEqual([{ type: "error", code: "failed" }]);
     expect(res.text).not.toContain("boom");
+  });
+
+  it("reports an unexpected failure to the reporter, with the route and not the question", async () => {
+    const failure = new Error("boom");
+    const broken: LlmClient = {
+      stream: () => {
+        throw failure;
+      },
+    };
+    const { reporter, reports } = recordingReporter();
+    const res = await ask(appWith(broken, { reporter }), { question: "What is my salary?" });
+
+    expect(parseEvents(res.text)).toEqual([{ type: "error", code: "failed" }]);
+    expect(reports).toEqual([{ error: failure, context: { source: "http", route: "/assistant" } }]);
+    expect(JSON.stringify(reports.map((report) => report.context))).not.toContain("salary");
+  });
+
+  it("does not report a model failure: it is expected, and only logged", async () => {
+    const failing: LlmClient = {
+      stream: () => {
+        throw new LlmError("unavailable", "The model service is not available");
+      },
+    };
+    const { reporter, reports } = recordingReporter();
+    await ask(appWith(failing, { reporter }));
+    expect(reports).toEqual([]);
   });
 
   it("answers a preflight request from an allowed origin, so the site can call it directly", async () => {

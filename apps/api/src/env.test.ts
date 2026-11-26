@@ -30,6 +30,19 @@ describe("loadEnv", () => {
     );
   });
 
+  it("keeps error reporting off without a DSN, and accepts only an https address", () => {
+    expect(loadEnv(required).SENTRY_DSN).toBeUndefined();
+    const dsn = "https://key@o1.ingest.de.sentry.io/2";
+    expect(loadEnv({ ...required, SENTRY_DSN: dsn })).toMatchObject({
+      SENTRY_DSN: dsn,
+      SENTRY_ENVIRONMENT: "production",
+    });
+    expect(() => loadEnv({ ...required, SENTRY_DSN: "not a url" })).toThrow(/SENTRY_DSN/);
+    expect(() => loadEnv({ ...required, SENTRY_DSN: "http://key@sentry.example/2" })).toThrow(
+      /SENTRY_DSN/,
+    );
+  });
+
   it("keeps the assistant off without a key and rejects a key that is too short", () => {
     expect(loadEnv(required).GEMINI_API_KEY).toBeUndefined();
     expect(loadEnv({ ...required, GEMINI_API_KEY: "k".repeat(30) }).GEMINI_API_KEY).toBe(

@@ -7,6 +7,7 @@ import { withBudget, type ModelBudget } from "../assistant/model-budget";
 import { prepareConversation, runAssistant } from "../assistant/run-assistant";
 import type { AssistantTool } from "../assistant/tools";
 import { rateLimiter } from "../middleware/rate-limit";
+import { noopReporter, type ErrorReporter } from "../observability/error-reporter";
 
 export interface AssistantRouteOptions {
   llm: LlmClient;
@@ -16,6 +17,8 @@ export interface AssistantRouteOptions {
   budget: ModelBudget;
   /** Questions per minute and visitor. */
   questionsPerMinute: number;
+  /** Where unexpected failures go. Model errors are expected and only logged. */
+  reporter?: ErrorReporter;
 }
 
 function errorCode(err: unknown): LlmError["kind"] {
@@ -45,7 +48,7 @@ export function assistantRouter(options?: AssistantRouteOptions) {
     },
     (req, res) => {
       if (!options) return;
-      const { llm, tools, logger, budget } = options;
+      const { llm, tools, logger, budget, reporter = noopReporter } = options;
 
       const parsed = AssistantRequest.safeParse(req.body);
       if (!parsed.success) throw new HttpError(400, "The request body is not valid");
@@ -93,7 +96,10 @@ export function assistantRouter(options?: AssistantRouteOptions) {
             // Only the kind and our own safe message are logged for a model failure; never the question.
             if (err instanceof LlmError)
               logger.warn({ err, kind: err.kind }, "Assistant model call failed");
-            else logger.error({ err }, "Assistant failed");
+            else {
+              logger.error({ err }, "Assistant failed");
+              reporter.report(err, { source: "http", route: "/assistant" });
+            }
             send({ type: "error", code });
           }
         } finally {

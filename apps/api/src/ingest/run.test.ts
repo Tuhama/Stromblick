@@ -4,6 +4,7 @@ import { createDb } from "../db";
 import { SMARD_SERIES } from "../smard/catalog";
 import { SMARD_BASE_URL, createSmardClient } from "../smard/client";
 import { createFixtureFetch } from "../smard/fixture-fetch";
+import { recordingReporter } from "../observability/recording-reporter";
 import { runIngest } from "./run";
 
 // Runs against a real Postgres when TEST_DATABASE_URL is set (CI sets it). The tests empty its tables,
@@ -119,5 +120,17 @@ describe.skipIf(url === undefined)("runIngest (database)", () => {
     const run = await db.ingestRun.findUnique({ where: { id: result.runId } });
     expect(run?.status).toBe("FAILED");
     expect(run?.error).toMatch(/^generation-solar: SMARD answered 404/);
+  });
+
+  it("reports a failed series with its key, and reports nothing when every series works", async () => {
+    const failing = recordingReporter();
+    await runIngest({ db, smard, logger, now, series: priceAndSolar, reporter: failing.reporter });
+    expect(failing.reports).toHaveLength(1);
+    expect(failing.reports[0]?.context).toEqual({ source: "ingest", series: "generation-solar" });
+    expect(failing.reports[0]?.error).toBeInstanceOf(Error);
+
+    const working = recordingReporter();
+    await runIngest({ db, smard, logger, now, series: price, reporter: working.reporter });
+    expect(working.reports).toEqual([]);
   });
 });

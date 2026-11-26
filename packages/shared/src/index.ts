@@ -8,3 +8,4 @@ export * from "./market";
 export * from "./assistant";
 export * from "./tomorrow";
 export * from "./time";
+export * from "./error-report";

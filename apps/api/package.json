@@ -17,6 +17,7 @@
     "@google/genai": "^3.4.0",
     "@prisma/adapter-pg": "catalog:",
     "@prisma/client": "catalog:",
+    "@sentry/node": "^11.17.0",
     "@stromblick/shared": "workspace:*",
     "cors": "^2.8.6",
     "express": "^5.3.0",

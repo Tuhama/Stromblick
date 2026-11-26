@@ -7,6 +7,7 @@ import type {
   SeriesKind as DbSeriesKind,
 } from "../generated/prisma/enums";
 import { SMARD_SERIES, type SmardResolution, type SmardSeries } from "../smard/catalog";
+import { noopReporter, type ErrorReporter } from "../observability/error-reporter";
 import { weeksSince, type SmardClient, type SmardReading } from "../smard/client";
 
 const DB_KIND = {
@@ -36,6 +37,8 @@ export interface IngestOptions {
   db: Db;
   smard: SmardClient;
   logger: Logger;
+  /** Where failed series and failed runs are reported. Default: nowhere. */
+  reporter?: ErrorReporter;
   now?: () => Date;
   /** Fetch every week with data at or after this moment. Default: yesterday, see below. */
   since?: Date;
@@ -50,6 +53,7 @@ export async function runIngest({
   db,
   smard,
   logger,
+  reporter = noopReporter,
   now = () => new Date(),
   // From yesterday on: on Mondays, Sunday's last values are still in the previous week's file.
   since = new Date(now().getTime() - DAY),
@@ -69,11 +73,13 @@ export async function runIngest({
         rowsWritten += written;
       } catch (err) {
         logger.warn({ err, series: item.key }, "Ingesting a series failed");
+        reporter.report(err, { source: "ingest", series: item.key });
         failures.push({ series: item.key, error: messageOf(err) });
       }
     }
   } catch (err) {
     logger.error({ err }, "Ingest run failed");
+    reporter.report(err, { source: "ingest" });
     failures.push({ series: "*", error: messageOf(err) });
   }
 

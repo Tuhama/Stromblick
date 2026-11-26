@@ -8,6 +8,8 @@ import { RouterProvider } from "react-router/dom";
 import "./index.css";
 import { createQueryClient } from "./api/query-client";
 import { initI18n } from "./i18n";
+import { readDsn } from "./observability/config";
+import { startErrorReporting } from "./observability/report-error";
 import { routes } from "./routes/routes";
 
 initI18n();
@@ -25,3 +27,10 @@ createRoot(rootElement).render(
     </QueryClientProvider>
   </StrictMode>,
 );
+
+// After the first render. The Sentry code is a separate file, downloaded only when there is a DSN
+// (the production build on Vercel); development and the tests never load it.
+startErrorReporting({
+  dsn: import.meta.env.PROD ? readDsn(import.meta.env.VITE_SENTRY_DSN) : undefined,
+  load: () => import("./observability/sentry-client"),
+});

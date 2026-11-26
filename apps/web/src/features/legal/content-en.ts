@@ -52,7 +52,7 @@ export const contentEn: LegalContent = {
   privacy: {
     title: "Privacy notice",
     intro: "This page also exists in German. The German version is the legally binding one.",
-    asOf: "As of 24 November 2026",
+    asOf: "As of 26 November 2026",
     sections: [
       {
         id: "controller",
@@ -68,6 +68,7 @@ export const contentEn: LegalContent = {
           "There are no accounts and no sign-in.",
           "There are no cookies, no advertising and no analytics or tracking services.",
           "The AI assistant sends your questions to Google (see below).",
+          "If the site breaks, a technical error report goes to Sentry (see below). It holds no personal data.",
           "Your settings (language, theme, price unit) stay in your own browser.",
         ],
       },
@@ -94,6 +95,16 @@ export const contentEn: LegalContent = {
         ],
       },
       {
+        id: "errors",
+        heading: "Error reports",
+        paragraphs: [
+          "When something breaks in the site or in the API, an error report is sent to Sentry (Functional Software, Inc., USA), in the EU region of Sentry (servers in Germany). I use it to find and fix faults.",
+          "A report holds the technical error (its message and where in the code it happened), the page path without any query part, the browser and system type, the time and the request number of the failed request. It holds no cookies, no user account, no recording of your visit and no IP address: I switched off storing IP addresses in Sentry. Texts that you type into the assistant never go into a report. On the assistant page, even the error message is removed before sending.",
+          "The error reporting starts after the page has been drawn, and only in the live version of the site. Some browser extensions that block trackers also block it. The site works the same without it.",
+          "The legal basis is Art. 6 (1) (f) GDPR. My legitimate interest is finding faults and keeping the site reliable. The transfer to Sentry in the USA relies on the adequacy decision for the EU-US Data Privacy Framework or on standard contractual clauses (Art. 45 and 46 GDPR).",
+        ],
+      },
+      {
         id: "storage",
         heading: "Settings in your browser",
         paragraphs: [
@@ -104,7 +115,7 @@ export const contentEn: LegalContent = {
         id: "external",
         heading: "External content",
         paragraphs: [
-          "The site loads no fonts, scripts or images from other servers and has no social media buttons.",
+          "The site loads no fonts, scripts or images from other servers and has no social media buttons. The only other server that your browser contacts is Sentry, and only to send an error report.",
           "The market data comes from the SMARD platform of the Bundesnetzagentur. The API server fetches it. No data about visitors is sent there.",
         ],
       },
