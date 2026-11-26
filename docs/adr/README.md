@@ -19,6 +19,7 @@ a new record supersedes the old one, and the old one's status links to it.
 | [0010](0010-compute-cheapest-windows-in-the-api.md)             | Compute the cheapest windows in the API and serve them from GET /tomorrow | Accepted |
 | [0011](0011-run-the-gemini-api-on-a-billing-enabled-project.md) | Run the Gemini API on a project with billing enabled                      | Accepted |
 | [0012](0012-enforce-a-strict-content-security-policy.md)        | Enforce a strict Content Security Policy with no inline code              | Accepted |
+| [0013](0013-end-to-end-tests-against-a-test-only-api-entry.md)  | Test the built app in a browser against a test-only API entry             | Accepted |
 
 ## Adding a record
 
