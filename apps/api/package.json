@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "backfill": "node --import tsx src/scripts/backfill.ts",
+    "e2e-server": "node --import tsx src/e2e/server.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

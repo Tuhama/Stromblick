@@ -104,6 +104,16 @@ docker compose exec db createdb -U stromblick stromblick_test
 DATABASE_URL=postgresql://stromblick:stromblick@localhost:5432/stromblick_test pnpm --filter @stromblick/api exec prisma migrate deploy
 ```
 
+The browser tests (Playwright and axe, in `apps/e2e`) are not part of `pnpm test`. They need their own
+database as well, and a Chromium. See [apps/e2e/README.md](apps/e2e/README.md):
+
+```bash
+docker compose exec db createdb -U stromblick stromblick_e2e
+DATABASE_URL=postgresql://stromblick:stromblick@localhost:5432/stromblick_e2e pnpm --filter @stromblick/api exec prisma migrate deploy
+pnpm --filter @stromblick/e2e exec playwright install chromium
+pnpm e2e
+```
+
 ## How this project is built
 
 Stromblick is built with AI, deliberately and in the open.
