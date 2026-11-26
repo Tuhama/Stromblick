@@ -157,3 +157,7 @@ CLAUDE.local.md
 apps/api/src/generated/
 # Storybook
 storybook-static
+
+# Playwright (apps/e2e)
+apps/e2e/test-results/
+apps/e2e/playwright-report/
