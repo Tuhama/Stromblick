@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import * as reporting from "../observability/report-error";
 import { FeatureBoundary } from "./FeatureBoundary";
 
 function Broken(): never {
@@ -23,6 +24,18 @@ describe("FeatureBoundary", () => {
     );
     expect(screen.getByText("all good")).toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("reports the crash with the name of the feature", () => {
+    const report = vi.spyOn(reporting, "reportError").mockImplementation(() => undefined);
+    render(
+      <FeatureBoundary feature="generation" label="Generation">
+        <Broken />
+      </FeatureBoundary>,
+    );
+    expect(report).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ message: "boom" }), {
+      feature: "generation",
+    });
   });
 
   it("replaces only the broken feature, and names it", () => {

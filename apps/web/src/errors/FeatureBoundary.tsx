@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { reportError } from "../observability/report-error";
 
 interface FeatureBoundaryProps {
   /** A short name for the log, e.g. "generation". Not shown to the reader. */
@@ -27,8 +28,8 @@ export class FeatureBoundary extends Component<FeatureBoundaryProps, FeatureBoun
   }
 
   override componentDidCatch(error: Error, info: ErrorInfo) {
-    // There is no error service yet; the browser console is where this can be found.
     console.error(`[${this.props.feature}] crashed while rendering`, error, info.componentStack);
+    reportError(error, { feature: this.props.feature });
   }
 
   override render() {
