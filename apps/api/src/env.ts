@@ -29,6 +29,11 @@ const EnvSchema = z.object({
   // What all visitors share, kept under the model's free-tier limits (see ADR 0008).
   ASSISTANT_MODEL_REQUESTS_PER_MINUTE: z.coerce.number().int().min(1).max(100_000).default(12),
   ASSISTANT_MODEL_REQUESTS_PER_DAY: z.coerce.number().int().min(1).max(10_000_000).default(400),
+  // Sentry's address for this project. Unset: errors are not reported (tests, local development).
+  SENTRY_DSN: z.url({ protocol: /^https$/ }).optional(),
+  // Shown with each error. Railway sets the commit hash in RAILWAY_GIT_COMMIT_SHA.
+  SENTRY_ENVIRONMENT: z.string().min(1).default("production"),
+  RAILWAY_GIT_COMMIT_SHA: z.string().min(1).optional(),
   CORS_ORIGINS: z
     .string()
     .default("http://localhost:5173")

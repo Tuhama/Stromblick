@@ -5,7 +5,8 @@ import cors from "cors";
 import { pinoHttp } from "pino-http";
 import type { Logger } from "pino";
 import { healthRouter } from "./routes/health";
-import { errorHandler, notFound } from "./middleware/error-handler";
+import { createErrorHandler, notFound } from "./middleware/error-handler";
+import { noopReporter, type ErrorReporter } from "./observability/error-reporter";
 import { DEFAULT_RATE_LIMIT_PER_MINUTE, rateLimiter } from "./middleware/rate-limit";
 import { assistantRouter, type AssistantRouteOptions } from "./routes/assistant";
 import { ingestRouter, type IngestRouteOptions } from "./routes/ingest";
@@ -36,6 +37,8 @@ export interface AppOptions {
   assistant?: AssistantRouteOptions;
   /** The clock; tests set it to a fixed moment. Defaults to the real time. */
   now?: () => Date;
+  /** Where errors that are our fault go. Default: nowhere. */
+  reporter?: ErrorReporter;
 }
 
 export function createApp({
@@ -48,6 +51,7 @@ export function createApp({
   rateLimitPerMinute = DEFAULT_RATE_LIMIT_PER_MINUTE,
   assistant,
   now = () => new Date(),
+  reporter = noopReporter,
 }: AppOptions) {
   const app = express();
 
@@ -98,6 +102,6 @@ export function createApp({
   app.use(tomorrowRouter(readings, now));
   app.use(assistantRouter(assistant));
   app.use(notFound);
-  app.use(errorHandler);
+  app.use(createErrorHandler(reporter));
   return app;
 }
