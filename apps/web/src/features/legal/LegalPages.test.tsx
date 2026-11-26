@@ -88,6 +88,17 @@ describe("the privacy notice", () => {
     ).toBeInTheDocument();
   });
 
+  it("tells what an error report holds and what it never holds", async () => {
+    renderApp("/datenschutz");
+
+    const errors = await screen.findByRole("region", { name: "Error reports" });
+    expect(
+      within(errors).getByText(/Sentry \(Functional Software, Inc., USA\)/),
+    ).toBeInTheDocument();
+    expect(within(errors).getByText(/EU region of Sentry/)).toBeInTheDocument();
+    expect(within(errors).getByText(/never go into a report/)).toBeInTheDocument();
+  });
+
   it("follows a language change without a reload", async () => {
     const user = userEvent.setup();
     renderApp("/datenschutz");

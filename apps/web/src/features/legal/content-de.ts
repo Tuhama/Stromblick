@@ -52,7 +52,7 @@ export const contentDe: LegalContent = {
   privacy: {
     title: "Datenschutzerklärung",
     intro: "Diese Seite gibt es auch auf Englisch. Maßgeblich ist die deutsche Fassung.",
-    asOf: "Stand: 24. November 2026",
+    asOf: "Stand: 26. November 2026",
     sections: [
       {
         id: "controller",
@@ -68,6 +68,7 @@ export const contentDe: LegalContent = {
           "Es gibt keine Konten und keine Anmeldung.",
           "Es gibt keine Cookies, keine Werbung und keine Analyse- oder Tracking-Dienste.",
           "Der KI-Assistent sendet deine Fragen an Google (siehe unten).",
+          "Wenn die Seite einen Fehler hat, geht ein technischer Fehlerbericht an Sentry (siehe unten). Er enthält keine personenbezogenen Daten.",
           "Deine Einstellungen (Sprache, Farbschema, Preiseinheit) bleiben in deinem eigenen Browser.",
         ],
       },
@@ -94,6 +95,16 @@ export const contentDe: LegalContent = {
         ],
       },
       {
+        id: "errors",
+        heading: "Fehlerberichte",
+        paragraphs: [
+          "Wenn in der Seite oder in der API etwas kaputtgeht, wird ein Fehlerbericht an Sentry (Functional Software, Inc., USA) gesendet, und zwar in der EU-Region von Sentry (Server in Deutschland). Ich nutze ihn, um Fehler zu finden und zu beheben.",
+          "Ein Bericht enthält den technischen Fehler (seine Meldung und die Stelle im Code), den Seitenpfad ohne Query-Teil, die Art von Browser und System, die Uhrzeit und die Anfragenummer der fehlgeschlagenen Anfrage. Er enthält keine Cookies, kein Benutzerkonto, keine Aufzeichnung deines Besuchs und keine IP-Adresse: Ich habe das Speichern von IP-Adressen in Sentry abgeschaltet. Texte, die du in den Assistenten eingibst, gelangen nie in einen Bericht. Auf der Seite des Assistenten wird sogar die Fehlermeldung vor dem Senden entfernt.",
+          "Die Fehlerberichte starten, nachdem die Seite gezeichnet wurde, und nur in der Live-Version der Seite. Manche Browser-Erweiterungen, die Tracker blockieren, blockieren sie ebenfalls. Die Seite funktioniert ohne sie genauso.",
+          "Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Mein berechtigtes Interesse ist es, Fehler zu finden und die Seite zuverlässig zu betreiben. Die Übermittlung an Sentry in die USA stützt sich auf den Angemessenheitsbeschluss zum EU-US Data Privacy Framework oder auf Standardvertragsklauseln (Art. 45 und 46 DSGVO).",
+        ],
+      },
+      {
         id: "storage",
         heading: "Einstellungen in deinem Browser",
         paragraphs: [
@@ -104,7 +115,7 @@ export const contentDe: LegalContent = {
         id: "external",
         heading: "Externe Inhalte",
         paragraphs: [
-          "Die Seite lädt keine Schriften, Skripte oder Bilder von fremden Servern und hat keine Social-Media-Schaltflächen.",
+          "Die Seite lädt keine Schriften, Skripte oder Bilder von fremden Servern und hat keine Social-Media-Schaltflächen. Der einzige weitere Server, mit dem dein Browser Kontakt aufnimmt, ist Sentry, und nur um einen Fehlerbericht zu senden.",
           "Die Marktdaten stammen von der Plattform SMARD der Bundesnetzagentur. Der Server der API ruft sie ab. Dabei werden keine Daten über Besucher dorthin gesendet.",
         ],
       },

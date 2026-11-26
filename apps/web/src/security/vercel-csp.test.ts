@@ -47,10 +47,15 @@ describe("the Content Security Policy in vercel.json", () => {
     expect(directives.get("frame-ancestors")).toEqual(["'none'"]);
   });
 
-  it("lets the browser call the API that the /api rewrite points to", () => {
+  it("lets the browser call the API that the /api rewrite points to, and Sentry's EU address", () => {
     const rewrite = config.rewrites.find((entry) => entry.source === "/api/:path*");
     if (!rewrite) throw new Error("vercel.json has no /api rewrite");
     const apiOrigin = new URL(rewrite.destination.replace(":path*", "")).origin;
-    expect(directives.get("connect-src")).toEqual(["'self'", apiOrigin]);
+    // Exact host, no wildcard: it is the ingest address of the stromblick-web project's DSN.
+    expect(directives.get("connect-src")).toEqual([
+      "'self'",
+      apiOrigin,
+      "https://o4512498602344448.ingest.de.sentry.io",
+    ]);
   });
 });
