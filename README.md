@@ -89,6 +89,10 @@ pnpm dev
 
 The web app runs on http://localhost:5173 and the API on http://localhost:3001.
 
+Error reporting (Sentry, [ADR 0014](docs/adr/0014-report-errors-to-sentry-with-a-scrubber.md)) is off
+unless `SENTRY_DSN` (API) or `VITE_SENTRY_DSN` (web, production build) is set, so nothing is sent
+from development, tests or CI.
+
 The assistant is off until the API has a key. To try it, put a free key from
 [Google AI Studio](https://aistudio.google.com/apikey) in `apps/api/.env` as `GEMINI_API_KEY` and
 restart. Without a key the API answers the assistant with 503, and the page says it is switched off.

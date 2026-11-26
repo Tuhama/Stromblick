@@ -20,6 +20,7 @@ a new record supersedes the old one, and the old one's status links to it.
 | [0011](0011-run-the-gemini-api-on-a-billing-enabled-project.md) | Run the Gemini API on a project with billing enabled                      | Accepted |
 | [0012](0012-enforce-a-strict-content-security-policy.md)        | Enforce a strict Content Security Policy with no inline code              | Accepted |
 | [0013](0013-end-to-end-tests-against-a-test-only-api-entry.md)  | Test the built app in a browser against a test-only API entry             | Accepted |
+| [0014](0014-report-errors-to-sentry-with-a-scrubber.md)         | Report errors to Sentry, loaded late and scrubbed twice                   | Accepted |
 
 ## Adding a record
 
